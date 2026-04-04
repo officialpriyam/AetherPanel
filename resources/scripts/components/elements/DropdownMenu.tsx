@@ -15,7 +15,8 @@ export const DropdownButtonRow = styled.button<{ danger?: boolean }>`
     transition: 150ms all ease;
 
     &:hover {
-        ${(props) => (props.danger ? tw`text-red-200 bg-red-700` : tw`text-neutral-100 bg-neutral-500`)};
+        ${(props) => (props.danger ? tw`text-red-200 bg-red-700` : tw`text-neutral-100`)};
+        ${(props) => (!props.danger ? 'background: rgba(51, 65, 85, 0.92);' : '')};
     }
 `;
 export const DropdownLinkRow = styled.a<{ danger?: boolean }>`
@@ -27,7 +28,8 @@ export const DropdownLinkRow = styled.a<{ danger?: boolean }>`
     }
 
     &:hover {
-        ${(props) => (props.danger ? tw`text-red-200 bg-red-700` : tw`text-neutral-100 bg-neutral-500`)};
+        ${(props) => (props.danger ? tw`text-red-200 bg-red-700` : tw`text-neutral-100`)};
+        ${(props) => (!props.danger ? 'background: rgba(51, 65, 85, 0.92);' : '')};
 
         & > svg{
             ${(props) => (props.danger ? tw`text-red-300` : tw`text-neutral-200`)};
@@ -121,7 +123,13 @@ class DropdownMenu extends React.PureComponent<Props, State> {
                                 this.setState({ visible: false });
                             }}
                             style={{ width: '12rem' }}
-                            className={`absolute bg-neutral-600 p-2 rounded-lg border border-neutral-500 shadow-lg text-neutral-200 z-50 ${this.props.sideBar ? '!left-10 !bottom-[3rem] !top-[auto] !fixed !z-[100]' : ''}`}
+                            className={`absolute pointer-events-auto p-2 rounded-lg shadow-lg text-neutral-200 z-[140] ${this.props.sideBar ? '!left-10 !bottom-[3rem] !top-[auto] !fixed !z-[160]' : ''}`}
+                            css={`
+                                background: rgba(15, 23, 42, 0.96);
+                                border: 1px solid rgba(148, 163, 184, 0.16);
+                                box-shadow: 0 18px 42px rgba(2, 6, 23, 0.28);
+                                backdrop-filter: blur(18px);
+                            `}
                         >
                             {this.props.children}
                         </div>

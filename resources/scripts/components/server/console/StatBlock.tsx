@@ -18,9 +18,15 @@ interface StatBlockProps {
 export default ({ title, copyOnClick, icon, color, className, children }: StatBlockProps) => {
     const { fontSize, ref } = useFitText({ minFontSize: 8, maxFontSize: 500 });
 
+    const cardStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(17, 24, 39, 0.78)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
     return (
         <CopyOnClick text={copyOnClick}>
-            <div className={classNames(styles.stat_block, 'bg-gray-600', className)}>
+            <div className={classNames(styles.stat_block, className)} style={cardStyle}>
                 <div className={classNames(styles.status_bar, color || 'bg-gray-700')} />
                 <div className={classNames(styles.icon, color || 'bg-gray-700')}>
                     <Icon

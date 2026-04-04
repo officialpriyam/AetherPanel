@@ -19,29 +19,40 @@ const ServerHeader = () => {
     const serverStatus = status || 'offline';
     const colors = statusColors[serverStatus] || statusColors.offline;
 
+    const headerStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(17, 24, 39, 0.78)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
+    const chipStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(30, 41, 59, 0.72)',
+        borderColor: 'rgba(148, 163, 184, 0.14)',
+    };
+
     return (
-        <div className={'mb-6 rounded-box bg-gray-800/40 backdrop-blur-md shadow-xl shadow-black/20 p-4 md:p-5'}>
+        <div className={'mb-6 rounded-box backdrop-blur-md p-4 md:p-5'} style={headerStyle}>
             <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4'}>
                 <div>
                     <h1 className={'text-3xl font-bold text-gray-50 mb-2'}>{name || 'Loading...'}</h1>
                     <div className={'flex flex-wrap items-center gap-3'}>
                         <div className={classNames(
-                            'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border bg-gray-700/50',
+                            'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border',
                             colors.text,
                             colors.border
-                        )}>
+                        )} style={chipStyle}>
                             <div className={classNames('w-2 h-2 rounded-full animate-pulse', colors.dot)} />
                             {serverStatus}
                         </div>
 
                         {id && (
-                            <div className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-gray-400 bg-gray-700/50 border border-gray-600/30 font-mono'}>
+                            <div className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs text-gray-400 border font-mono'} style={chipStyle}>
                                 #{id.substring(0, 8)}
                             </div>
                         )}
 
                         {node && (
-                            <div className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-gray-300 bg-gray-700/50 border border-gray-600/30'}>
+                            <div className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-gray-300 border'} style={chipStyle}>
                                 Node: {node}
                             </div>
                         )}

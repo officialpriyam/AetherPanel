@@ -17,7 +17,10 @@ const ServerContentBlock: React.FC<Props> = ({ title, icon: Icon, children, ...p
         <PageContentBlock title={`${name} | ${title}`} {...props}>
             {pageTitle == 'true' && Icon &&
                 <div className={'flex items-center gap-x-3 mb-6'}>
-                    <div css={'background-color:color-mix(in srgb, var(--primary) 30%, transparent);'} className={'w-10 h-10 rounded-component !border-none flex items-center justify-center text-flash backdrop'}>
+                    <div
+                        css={'background: rgba(30, 41, 59, 0.92); border: 1px solid rgba(148, 163, 184, 0.16);'}
+                        className={'w-10 h-10 rounded-component !border-none flex items-center justify-center text-blue-300 backdrop'}
+                    >
                         <Icon className={'w-6'} />
                     </div>
                     <p className={'text-lg font-medium text-gray-300'}>

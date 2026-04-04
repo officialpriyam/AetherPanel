@@ -45,7 +45,7 @@ const MobileLinks = styled.div`
                 ${tw`text-gray-50`};
 
                 & > svg{
-                    ${tw`text-flash`}
+                    ${tw`text-gray-100`}
                 }
             }
         }
@@ -176,9 +176,19 @@ export default ({ children }: Props) => {
         fetchData();
       }, []);
 
+    const topBarStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.82)',
+        borderBottom: '1px solid rgba(148, 163, 184, 0.12)',
+        boxShadow: '0 10px 26px rgba(2, 6, 23, 0.12)',
+    };
+
+    const mobileMenuStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    };
+
     return (
         <>
-        <div className={`w-full px-4 overflow-x-auto !overflow-visible z-20 relative ${layout == 3 ? 'bg-gray-700 backdrop !border-0' : ''}`}>
+        <div className={`w-full px-4 overflow-x-auto !overflow-visible z-20 relative ${layout == 3 ? 'backdrop !border-0' : ''}`} style={layout == 3 ? topBarStyle : undefined}>
             <div className={`mx-auto w-full flex items-center justify-between max-w-[1200px] py-2`}>
                 <div className="flex gap-x-10 items-center">
                     {layout == 3 &&
@@ -217,7 +227,7 @@ export default ({ children }: Props) => {
             </div>
         </div>
         {isOpen &&
-            <div className={'fixed top-0 left-0 h-full w-full bg-gray-700 z-[99] backdrop-blur-xl px-4 py-2 flex flex-col overflow-y-auto text-xl'}>
+            <div className={'fixed top-0 left-0 h-full w-full z-[99] backdrop-blur-xl px-4 py-2 flex flex-col overflow-y-auto text-xl'} style={mobileMenuStyle}>
                 <div className={'flex justify-between items-center'}>
                     <div className={'flex gap-x-2 items-center'} onClick={() => setIsOpen((isOpen) => !isOpen)}>
                         <Link to={'/'} className='flex gap-x-2 items-center font-semibold text-lg text-gray-50 py-2'>

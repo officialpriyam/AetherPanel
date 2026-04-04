@@ -30,7 +30,8 @@ const NavigationLinks = styled.div`
         }
         & > span{
             ${tw`pointer-events-none fixed opacity-0 bottom-[10px] left-[95px] backdrop-blur-md rounded-component px-3 py-2 duration-300`};
-            background-color: color-mix(in srgb, var(--gray500) 50%, transparent);
+            background-color: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.14);
         }
 
         &:hover > span{
@@ -89,15 +90,24 @@ const SideBarIcon = ({ children }: Props) => {
         });
     };
 
+    const shellStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.84)',
+        borderRight: '1px solid rgba(148, 163, 184, 0.16)',
+        boxShadow: '18px 0 42px rgba(2, 6, 23, 0.16)',
+    };
+
+    const dividerStyle: React.CSSProperties = {
+        borderColor: 'rgba(148, 163, 184, 0.16)',
+    };
+
     return (
-    <div className={'w-[75px] shrink-0 bg-gray-700 h-screen overflow-y-auto md:flex hidden flex-col sticky top-0 backdrop border-t-0 border-b-0 border-l-0 px-4 py-3'}>
+    <div className={'w-[75px] shrink-0 h-screen overflow-y-auto md:flex hidden flex-col sticky top-0 backdrop border-t-0 border-b-0 border-l-0 px-4 py-3'} style={shellStyle}>
         <SpinnerOverlay visible={isLoggingOut} />
+        <Link to={'/'} className={'flex items-center justify-center pb-3 mb-2'} title={t('servers')}>
+            <img src={logo} alt={name + 'logo'} css={`height:${logoHeight}; width:auto; display:block;`} />
+        </Link>
         <NavigationLinks>
-            <div className={'pb-2 border-b border-gray-400'}>
-                <NavLink to={'/'} exact>
-                    <img src={logo} alt={name + 'logo'} css={`height:${logoHeight};`} />
-                    <span>{t('servers')}</span>
-                </NavLink>
+            <div className={'pb-2 border-b'} style={dividerStyle}>
                 <NavLink to={'/account'} exact>
                     <UserCircleIcon/>
                     <span>{t('account')}</span>
@@ -120,7 +130,7 @@ const SideBarIcon = ({ children }: Props) => {
                 )}
             </div>
             {children ? children : ''}
-            <div className={'mt-auto pt-2 border-t border-gray-400'}>
+            <div className={'mt-auto pt-2 border-t'} style={dividerStyle}>
                 <button onClick={onTriggerLogout}>
                     <LogoutIcon />
                     <span>{t('logout')}</span>

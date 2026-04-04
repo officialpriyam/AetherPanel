@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Spinner from '@/components/elements/Spinner';
 import tw from 'twin.macro';
 import styled, { css } from 'styled-components/macro';
 import { breakpoint } from '@/theme';
 import Fade from '@/components/elements/Fade';
-import { createPortal } from 'react-dom';
+import Portal from '@/components/elements/Portal';
 
 export interface RequiredModalProps {
     visible: boolean;
@@ -21,7 +21,8 @@ export interface ModalProps extends RequiredModalProps {
 }
 
 export const ModalMask = styled.div`
-    ${tw`fixed z-50 overflow-auto flex w-full inset-0`};
+    ${tw`fixed overflow-auto flex w-full inset-0`};
+    z-index: 130;
     backdrop-filter:blur(8px);
     background: rgba(0, 0, 0, 0.5);
 `;
@@ -142,9 +143,11 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 const PortaledModal: React.FC<ModalProps> = ({ children, ...props }) => {
-    const element = useRef(document.getElementById('modal-portal'));
-
-    return createPortal(<Modal {...props}>{children}</Modal>, element.current!);
+    return (
+        <Portal>
+            <Modal {...props}>{children}</Modal>
+        </Portal>
+    );
 };
 
 export default PortaledModal;

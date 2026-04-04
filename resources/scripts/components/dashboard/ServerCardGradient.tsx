@@ -57,6 +57,12 @@ export default ({ server }: { server: Server }) => {
         e.dataTransfer.setData('serverIdentifier', server.uuidShort);
     };
 
+    const manageButtonStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+        border: '1px solid rgba(148, 163, 184, 0.2)',
+        color: '#e5edf7',
+    };
+
     return (
         <>
         <div
@@ -157,7 +163,7 @@ export default ({ server }: { server: Server }) => {
                 </div>
             </div>
             <div className={'px-6 pt-4 pb-5'}>
-                <Link to={`/server/${server.id}`} className={'text-secondary-50 bg-secondary-200 border border-secondary-100 hover:bg-secondary-100 rounded-component px-3 py-3 w-full block text-center duration-300'}>
+                <Link to={`/server/${server.id}`} className={'rounded-component px-3 py-3 w-full block text-center duration-300 hover:bg-gray-600/70'} style={manageButtonStyle}>
                     {t('manage-server', { ns: 'flash/dashboard'})}
                 </Link>
             </div>

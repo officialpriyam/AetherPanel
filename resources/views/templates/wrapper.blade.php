@@ -62,6 +62,7 @@
         @php
             $bgImage = $siteConfiguration['flash']['backgroundImage'] ?? 'none';
             $bgImageLight = $siteConfiguration['flash']['backgroundImage'] ?? 'none';
+            $loaderLogo = trim((string) ($siteConfiguration['flash']['logo'] ?? '')) ?: '/favicons/android-chrome-192x192.png';
             $normalizeBg = function ($value) {
                 $value = trim((string) $value);
                 if ($value === '' || $value === 'none') {
@@ -76,6 +77,11 @@
             $bgImageLightCss = $normalizeBg($bgImageLight);
         @endphp
         <style>
+            html {
+                min-height: 100%;
+                background: var(--gray900, #020617);
+            }
+
             :root{
                 <?php if ($siteConfiguration['flash']['borderInput'] === 'true') {
                     echo '--borderInput: 1px solid;
@@ -119,18 +125,18 @@
                 --secondaryBorder: {{ $siteConfiguration['flash']['secondaryBorder'] }};
                 --secondaryBackground: {{ $siteConfiguration['flash']['secondaryBackground'] }};
 
-                --gray50: {{ $siteConfiguration['flash']['gray50'] }};
-                --gray100: {{ $siteConfiguration['flash']['gray100'] }};
-                --gray200: {{ $siteConfiguration['flash']['gray200'] }};
-                --gray300: {{ $siteConfiguration['flash']['gray300'] }};
-                --gray400: {{ $siteConfiguration['flash']['gray400'] }};
-                --gray500: {{ $siteConfiguration['flash']['gray500'] }};
-                --gray600: {{ $siteConfiguration['flash']['gray600'] }};
-                --gray700: color-mix(in srgb, {{ $siteConfiguration['flash']['gray700'] }} {{ $siteConfiguration['flash']['backdropPercentage'] }}, transparent);
-                --gray800: {{ $siteConfiguration['flash']['gray800'] }};
-                --gray900: {{ $siteConfiguration['flash']['gray900'] }};
+                --gray50: #F8FAFC;
+                --gray100: #E2E8F0;
+                --gray200: #CBD5E1;
+                --gray300: #94A3B8;
+                --gray400: #64748B;
+                --gray500: #475569;
+                --gray600: #334155;
+                --gray700: color-mix(in srgb, #1E293B {{ $siteConfiguration['flash']['backdropPercentage'] }}, transparent);
+                --gray800: #0F172A;
+                --gray900: #020617;
 
-                --gray700-default: {{ $siteConfiguration['flash']['gray700'] }};;
+                --gray700-default: #1E293B;
             }
             <?php if ($siteConfiguration['flash']['defaultMode'] !== 'darkmode') {
                 echo ':root';
@@ -153,22 +159,22 @@
                 --secondaryBorder: {{ $siteConfiguration['flash']['lightmode_secondaryBorder'] }};
                 --secondaryBackground: {{ $siteConfiguration['flash']['lightmode_secondaryBackground'] }};
 
-                --gray50: {{ $siteConfiguration['flash']['lightmode_gray50'] }};
-                --gray100: {{ $siteConfiguration['flash']['lightmode_gray100'] }};
-                --gray200: {{ $siteConfiguration['flash']['lightmode_gray200'] }};
-                --gray300: {{ $siteConfiguration['flash']['lightmode_gray300'] }};
-                --gray400: {{ $siteConfiguration['flash']['lightmode_gray400'] }};
-                --gray500: {{ $siteConfiguration['flash']['lightmode_gray500'] }};
-                --gray600: {{ $siteConfiguration['flash']['lightmode_gray600'] }}; 
-                --gray700: color-mix(in srgb, {{ $siteConfiguration['flash']['lightmode_gray700'] }} {{ $siteConfiguration['flash']['backdropPercentage'] }}, transparent);
-                --gray800: {{ $siteConfiguration['flash']['lightmode_gray800'] }};
-                --gray900: {{ $siteConfiguration['flash']['lightmode_gray900'] }};
+                --gray50: #0F172A;
+                --gray100: #1E293B;
+                --gray200: #334155;
+                --gray300: #475569;
+                --gray400: #64748B;
+                --gray500: #94A3B8;
+                --gray600: #CBD5E1;
+                --gray700: color-mix(in srgb, #E2E8F0 {{ $siteConfiguration['flash']['backdropPercentage'] }}, transparent);
+                --gray800: #F1F5F9;
+                --gray900: #FFFFFF;
 
-                --gray700-default: {{ $siteConfiguration['flash']['lightmode_gray700'] }};;
+                --gray700-default: #E2E8F0;
             }
 
             <?php if ($siteConfiguration['flash']['backdrop'] === 'true') {
-                echo '.backdrop{border:1px solid;border-color:var(--gray600)!important;backdrop-filter:blur(16px);background-color:color-mix(in srgb, var(--gray700-default) 65%, transparent);box-shadow:0 18px 35px rgb(0 0 0 / 22%);}';
+                echo '.backdrop{border:1px solid;border-color:rgba(148,163,184,.16)!important;backdrop-filter:blur(16px);background-color:rgba(15,23,42,.74)!important;box-shadow:0 18px 35px rgb(0 0 0 / 22%);}';
             }?>
             @import url('//fonts.googleapis.com/css?family=Rubik:300,400,500&display=swap');
             @import url('//fonts.googleapis.com/css?family=IBM+Plex+Mono|IBM+Plex+Sans:500&display=swap');
@@ -183,7 +189,7 @@
                 flex-direction: column;
                 gap: 14px;
                 background:
-                    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 45%),
+                    radial-gradient(circle at 20% 15%, rgba(148, 163, 184, 0.18), transparent 45%),
                     linear-gradient(135deg, var(--gray900), var(--gray800));
                 transition: opacity 0.45s ease, visibility 0.45s ease;
             }
@@ -198,7 +204,7 @@
                 width: 42px;
                 height: 42px;
                 object-fit: contain;
-                filter: drop-shadow(0 0 12px color-mix(in srgb, var(--primary) 40%, transparent));
+                filter: drop-shadow(0 0 12px rgba(148, 163, 184, 0.3));
             }
 
             .site-loader-ring {
@@ -223,26 +229,37 @@
                 }
             }
 
+            body.flash-bg {
+                min-height: 100vh;
+                background-color: var(--gray900, #020617) !important;
+                background-image: var(--image);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }
+
             .flash-bg {
                 position: relative;
-                isolation: isolate;
-                z-index: 0;
                 background: transparent !important;
             }
 
-            .flash-bg::before {
-                content: '';
+            .site-background {
                 position: fixed;
                 inset: 0;
+                z-index: 0;
                 background-image: var(--image);
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
                 filter: blur(var(--image-blur, 0px));
                 transform: scale(1.05);
-                z-index: -2;
                 opacity: 1;
                 pointer-events: none;
+            }
+
+            .flash-bg::before {
+                display: none;
             }
 
             .flash-bg::after {
@@ -251,9 +268,25 @@
                 inset: 0;
                 background:
                     linear-gradient(180deg, rgba(3, 7, 18, 0.24), rgba(3, 7, 18, 0.58)),
-                    radial-gradient(circle at top, color-mix(in srgb, var(--primary) 8%, transparent), transparent 36%);
-                z-index: -1;
+                    radial-gradient(circle at top, rgba(148, 163, 184, 0.07), transparent 36%);
+                z-index: 1;
                 pointer-events: none;
+            }
+
+            body.flash-bg > *:not(#site-loader):not(#effects-layer):not(#site-background):not(.flash-ui-portal-root) {
+                position: relative;
+                z-index: 2;
+            }
+
+            .flash-ui-portal-root {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 120 !important;
+                pointer-events: none;
+            }
+
+            .flash-ui-portal-root > * {
+                pointer-events: auto;
             }
 
             .effects-layer {
@@ -261,12 +294,12 @@
                 inset: 0;
                 pointer-events: none;
                 overflow: hidden;
-                z-index: 1;
+                z-index: 3;
             }
 
             #app {
                 position: relative;
-                z-index: 2;
+                z-index: 4;
             }
 
             .effect-snow {
@@ -327,9 +360,10 @@
 
         @include('layouts.scripts')
     </head>
-    <body class="{{ $css['body'] ?? 'bg-neutral-50' }} flash-bg">
+    <body class="{{ $css['body'] ?? 'bg-neutral-950' }} flash-bg">
+        <div id="site-background" class="site-background" aria-hidden="true"></div>
         <div id="site-loader" class="site-loader" aria-live="polite" aria-label="Loading panel">
-            <img src="{{ $siteConfiguration['flash']['logo'] }}" class="site-loader-logo" alt="Panel logo" />
+            <img src="{{ $loaderLogo }}" class="site-loader-logo" alt="Panel logo" />
             <div class="site-loader-ring"></div>
             <div class="site-loader-text">Loading panel...</div>
         </div>
@@ -357,6 +391,39 @@
         @show
         <script>
             (function () {
+                const config = window.SiteConfiguration && window.SiteConfiguration.flash;
+                if (!config || !config.backgroundImage) {
+                    return;
+                }
+
+                const value = String(config.backgroundImage).trim();
+                if (!value || value === 'none') {
+                    return;
+                }
+
+                const normalized = value.startsWith('url(')
+                    ? value
+                    : `url("${value.replace(/"/g, '\\"')}")`;
+
+                document.documentElement.style.setProperty('--image', normalized);
+                document.body.style.setProperty('--image', normalized);
+                document.body.style.backgroundImage = normalized;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = 'fixed';
+
+                const background = document.getElementById('site-background');
+                if (background) {
+                    background.style.backgroundImage = normalized;
+                    background.style.backgroundSize = 'cover';
+                    background.style.backgroundPosition = 'center';
+                    background.style.backgroundRepeat = 'no-repeat';
+                }
+            })();
+        </script>
+        <script>
+            (function () {
                 const loader = document.getElementById('site-loader');
                 if (!loader) {
                     return;
@@ -370,10 +437,13 @@
                     window.setTimeout(() => loader.remove(), 400);
                 };
 
-                window.addEventListener('panel:ready', hideLoader, { once: true });
-                document.addEventListener('DOMContentLoaded', () => window.setTimeout(hideLoader, 200), { once: true });
-                window.addEventListener('load', () => window.setTimeout(hideLoader, 200), { once: true });
-                window.setTimeout(hideLoader, 2000);
+                window.addEventListener('panel:ready', () => window.setTimeout(hideLoader, 180), { once: true });
+                if (document.readyState === 'complete') {
+                    window.setTimeout(hideLoader, 320);
+                } else {
+                    window.addEventListener('load', () => window.setTimeout(hideLoader, 320), { once: true });
+                }
+                window.setTimeout(hideLoader, 3200);
             })();
         </script>
         <script>

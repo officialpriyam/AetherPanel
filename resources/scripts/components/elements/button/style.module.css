@@ -47,11 +47,23 @@
 }
 
 .text {
-    @apply bg-secondary-200 text-secondary-50 border-secondary-100 border-[1px];
-    @apply hover:text-secondary-50 active:text-secondary-50 hover:bg-secondary-100 active:bg-secondary-100 focus:ring-secondary-100;
+    @apply border-[1px];
+    background: rgba(30, 41, 59, 0.92);
+    color: #e5edf7;
+    border-color: rgba(148, 163, 184, 0.2);
+    @apply hover:text-white active:text-white focus:ring-gray-400;
+
+    &:hover,
+    &:active {
+        background: rgba(51, 65, 85, 0.92);
+        border-color: rgba(148, 163, 184, 0.28);
+    }
 
     &.secondary {
-        @apply hover:bg-secondary-200 active:bg-secondary-100;
+        &:hover,
+        &:active {
+            background: rgba(30, 41, 59, 0.92);
+        }
     }
 
     &:disabled {

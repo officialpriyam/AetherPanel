@@ -20,7 +20,9 @@
 
 .terminal {
     @apply flex flex-col w-full h-full py-3 md:px-3 px-6;
-    background-color: var(--gray700);
+    background-color: rgba(17, 24, 39, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow: 0 18px 42px rgba(2, 6, 23, 0.18);
 
     & .overflows_container {
         @apply -ml-4 sm:ml-0;
@@ -52,12 +54,17 @@
     }
 
     & .command_input {
-        @apply relative bg-gray-600 px-2 text-gray-100 pl-10 pr-4 py-3 w-full text-sm rounded-component !border-gray-500;
+        @apply relative px-2 text-gray-100 pl-10 pr-4 py-3 w-full text-sm rounded-component;
         @apply focus:ring-0 outline-none focus-visible:outline-none;
+        background-color: rgba(30, 41, 59, 0.92);
+        border-color: rgba(148, 163, 184, 0.16) !important;
         border: var(--borderInput);
     }
 }
 
 .chart_container {
-    @apply bg-gray-700 rounded-box pt-2 border-b-4 border-gray-700 relative;
+    @apply rounded-box pt-2 relative;
+    background-color: rgba(17, 24, 39, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow: 0 18px 42px rgba(2, 6, 23, 0.18);
 }

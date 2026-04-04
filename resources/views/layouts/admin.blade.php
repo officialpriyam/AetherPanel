@@ -35,28 +35,29 @@
                     : (str_starts_with($adminBackgroundImage, 'url(')
                         ? $adminBackgroundImage
                         : 'url(' . json_encode($adminBackgroundImage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . ')');
+                $adminLogo = trim((string) ($siteConfiguration['flash']['logo'] ?? ''));
+                $adminLogoHeight = trim((string) ($siteConfiguration['flash']['logoHeight'] ?? '34px'));
             @endphp
             <style>
                 body.admin-glass {
-                    --admin-primary: #2563eb;
-                    --admin-gray-50: {{ $siteConfiguration['flash']['gray50'] ?? '#F8FAFC' }};
-                    --admin-gray-100: {{ $siteConfiguration['flash']['gray100'] ?? '#F1F5F9' }};
-                    --admin-gray-200: {{ $siteConfiguration['flash']['gray200'] ?? '#E2E8F0' }};
-                    --admin-gray-300: {{ $siteConfiguration['flash']['gray300'] ?? '#94A3B8' }};
-                    --admin-gray-400: {{ $siteConfiguration['flash']['gray400'] ?? '#64748B' }};
-                    --admin-gray-500: {{ $siteConfiguration['flash']['gray500'] ?? '#334155' }};
-                    --admin-gray-600: {{ $siteConfiguration['flash']['gray600'] ?? '#1E293B' }};
-                    --admin-gray-700: {{ $siteConfiguration['flash']['gray700-default'] ?? ($siteConfiguration['flash']['gray700'] ?? '#0F172A') }};
-                    --admin-gray-800: {{ $siteConfiguration['flash']['gray800'] ?? '#0B0F1A' }};
-                    --admin-gray-900: {{ $siteConfiguration['flash']['gray900'] ?? '#020617' }};
-                    --admin-success: #16a34a;
-                    --admin-danger: #dc2626;
+                    --admin-primary: {{ $siteConfiguration['flash']['primary'] ?? '#2563eb' }};
+                    --admin-gray-50: #F8FAFC;
+                    --admin-gray-100: #E2E8F0;
+                    --admin-gray-200: #CBD5E1;
+                    --admin-gray-300: #94A3B8;
+                    --admin-gray-400: #64748B;
+                    --admin-gray-500: #475569;
+                    --admin-gray-600: #334155;
+                    --admin-gray-700: #1E293B;
+                    --admin-gray-800: #0F172A;
+                    --admin-gray-900: #020617;
+                    --admin-success: {{ $siteConfiguration['flash']['successBorder'] ?? '#16a34a' }};
+                    --admin-danger: {{ $siteConfiguration['flash']['dangerBorder'] ?? '#dc2626' }};
                     --admin-warning: #d97706;
                     --admin-info: #0891b2;
                     background:
-                        radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--admin-primary) 8%, transparent), transparent 30%),
-                        radial-gradient(circle at 100% 10%, color-mix(in srgb, var(--admin-gray-200) 7%, transparent), transparent 28%),
-                        linear-gradient(180deg, var(--admin-gray-900) 0%, color-mix(in srgb, var(--admin-gray-800) 85%, #030712) 35%, color-mix(in srgb, var(--admin-gray-700) 88%, #020617) 100%);
+                        radial-gradient(circle at 0% 0%, rgba(148, 163, 184, 0.05), transparent 30%),
+                        linear-gradient(180deg, #020617 0%, #0b1220 42%, #0f172a 100%);
                     color: #dde6f3;
                 }
 
@@ -80,9 +81,7 @@
                     position: fixed;
                     inset: 0;
                     z-index: -1;
-                    background:
-                        linear-gradient(180deg, rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.72)),
-                        radial-gradient(circle at top, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 34%);
+                    background: linear-gradient(180deg, rgba(2, 6, 23, 0.86), rgba(2, 6, 23, 0.78));
                     pointer-events: none;
                 }
 
@@ -110,7 +109,7 @@
                 body.admin-glass .main-header .logo {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    justify-content: center;
                     width: 270px;
                     height: 64px;
                     padding: 0 18px;
@@ -119,36 +118,14 @@
                     letter-spacing: 0.02em;
                 }
 
-                body.admin-glass .admin-brand-mark {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 12px;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #ffffff;
-                    background: linear-gradient(135deg, color-mix(in srgb, var(--admin-primary) 88%, white), color-mix(in srgb, var(--admin-primary) 48%, #0f172a));
-                    box-shadow: 0 18px 35px color-mix(in srgb, var(--admin-primary) 24%, transparent);
-                    flex-shrink: 0;
-                }
-
-                body.admin-glass .admin-brand-stack {
-                    display: flex;
-                    flex-direction: column;
-                    line-height: 1.05;
-                }
-
-                body.admin-glass .admin-brand-title {
-                    font-size: 14px;
-                    font-weight: 700;
-                    color: #f8fafc;
-                }
-
-                body.admin-glass .admin-brand-subtitle {
-                    font-size: 11px;
-                    color: #8ea0b8;
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
+                body.admin-glass .admin-brand-logo {
+                    display: block;
+                    height: {{ $adminLogoHeight }};
+                    max-height: 38px;
+                    width: auto;
+                    max-width: 100%;
+                    object-fit: contain;
+                    filter: drop-shadow(0 8px 18px rgba(2, 6, 23, 0.22));
                 }
 
                 body.admin-glass .main-header .navbar {
@@ -228,9 +205,9 @@
                 body.admin-glass .main-sidebar {
                     width: 270px;
                     padding: 16px 14px 20px;
-                    background: color-mix(in srgb, var(--admin-gray-900) 84%, transparent) !important;
+                    background: rgba(2, 6, 23, 0.92) !important;
                     border-right: 1px solid rgba(148, 163, 184, 0.1) !important;
-                    backdrop-filter: blur(22px);
+                    backdrop-filter: blur(14px);
                 }
 
                 body.admin-glass .sidebar {
@@ -276,7 +253,7 @@
                 body.admin-glass .sidebar-menu > li > a:hover,
                 body.admin-glass .sidebar-menu > li.active > a {
                     color: #ffffff !important;
-                    background: color-mix(in srgb, var(--admin-gray-100) 6%, transparent) !important;
+                    background: rgba(30, 41, 59, 0.72) !important;
                     border-color: rgba(148, 163, 184, 0.12);
                     box-shadow: 0 12px 24px rgba(2, 6, 23, 0.22);
                 }
@@ -320,9 +297,9 @@
                 body.admin-glass .alert {
                     border: 1px solid rgba(148, 163, 184, 0.1) !important;
                     border-radius: 12px !important;
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-gray-700) 88%, transparent), color-mix(in srgb, var(--admin-gray-800) 88%, transparent)) !important;
+                    background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.94)) !important;
                     box-shadow: 0 16px 34px rgba(2, 6, 23, 0.22) !important;
-                    backdrop-filter: blur(16px);
+                    backdrop-filter: blur(10px);
                     color: #dfe8f6 !important;
                 }
 
@@ -384,10 +361,10 @@
                 }
 
                 body.admin-glass .btn-primary {
-                    background: #2563eb !important;
-                    border-color: #2563eb !important;
+                    background: #1d4ed8 !important;
+                    border-color: rgba(191, 219, 254, 0.3) !important;
                     color: #fff !important;
-                    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
+                    box-shadow: 0 10px 20px rgba(29, 78, 216, 0.18);
                 }
 
                 body.admin-glass .btn-success {
@@ -449,9 +426,9 @@
                 body.admin-glass .btn-group .btn.active,
                 body.admin-glass .btn-group .btn:active,
                 body.admin-glass .btn-group .open > .dropdown-toggle.btn {
-                    background: #1d4ed8 !important;
-                    border-color: #1d4ed8 !important;
-                    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.2) !important;
+                    background: rgba(51, 65, 85, 0.96) !important;
+                    border-color: rgba(148, 163, 184, 0.28) !important;
+                    box-shadow: 0 12px 26px rgba(2, 6, 23, 0.18) !important;
                 }
 
                 body.admin-glass .form-control,
@@ -461,7 +438,7 @@
                     min-height: 42px;
                     border-radius: 6px !important;
                     border: 1px solid rgba(148, 163, 184, 0.12) !important;
-                    background: color-mix(in srgb, var(--admin-gray-900) 68%, transparent) !important;
+                    background: rgba(15, 23, 42, 0.9) !important;
                     color: var(--admin-gray-100) !important;
                     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
                     padding: 10px 12px;
@@ -482,9 +459,9 @@
                 body.admin-glass .form-control:focus,
                 body.admin-glass .select2-container--default.select2-container--focus .select2-selection--multiple,
                 body.admin-glass .select2-container--default.select2-container--open .select2-selection--single {
-                    border-color: color-mix(in srgb, var(--admin-primary) 34%, white) !important;
-                    background: color-mix(in srgb, var(--admin-gray-900) 72%, transparent) !important;
-                    box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-primary) 12%, transparent) !important;
+                    border-color: rgba(148, 163, 184, 0.32) !important;
+                    background: rgba(15, 23, 42, 0.96) !important;
+                    box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.12) !important;
                 }
 
                 body.admin-glass .form-group label,
@@ -500,7 +477,7 @@
                 body.admin-glass .input-group-addon {
                     border-radius: 6px !important;
                     border: 1px solid rgba(148, 163, 184, 0.12) !important;
-                    background: color-mix(in srgb, var(--admin-gray-800) 92%, transparent) !important;
+                    background: rgba(30, 41, 59, 0.9) !important;
                     color: var(--admin-gray-300) !important;
                 }
 
@@ -535,7 +512,7 @@
                 }
 
                 body.admin-glass .box.box-primary {
-                    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--admin-primary) 24%, transparent), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                    box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.14), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
                 }
 
                 body.admin-glass .box.box-success {
@@ -564,7 +541,7 @@
 
                 body.admin-glass .nav-tabs-custom > .nav-tabs > li.active > a,
                 body.admin-glass .nav-tabs-custom > .nav-tabs > li > a:hover {
-                    background: color-mix(in srgb, var(--admin-gray-100) 6%, transparent) !important;
+                    background: rgba(30, 41, 59, 0.7) !important;
                     color: var(--admin-gray-50) !important;
                     border: 1px solid rgba(148, 163, 184, 0.12) !important;
                 }
@@ -587,7 +564,7 @@
                 }
 
                 body.admin-glass .table > tbody > tr:hover > td {
-                    background: color-mix(in srgb, var(--admin-gray-100) 4%, transparent) !important;
+                    background: rgba(30, 41, 59, 0.66) !important;
                 }
 
                 body.admin-glass .box-tools {
@@ -664,8 +641,8 @@
                 body.admin-glass .pagination > .active > span,
                 body.admin-glass .pagination > li > a:hover,
                 body.admin-glass .pagination > li > span:hover {
-                    background: color-mix(in srgb, var(--admin-primary) 16%, var(--admin-gray-800)) !important;
-                    border-color: color-mix(in srgb, var(--admin-primary) 20%, white) !important;
+                    background: rgba(51, 65, 85, 0.9) !important;
+                    border-color: rgba(148, 163, 184, 0.22) !important;
                     color: #ffffff !important;
                 }
 
@@ -729,7 +706,7 @@
 
                 body.admin-glass .select2-results__option--highlighted[aria-selected],
                 body.admin-glass .select2-results__option[aria-selected=true] {
-                    background: color-mix(in srgb, var(--admin-primary) 14%, var(--admin-gray-800)) !important;
+                    background: rgba(51, 65, 85, 0.88) !important;
                     color: #ffffff !important;
                 }
 
@@ -748,7 +725,7 @@
 
                 body.admin-glass input[type='checkbox'],
                 body.admin-glass input[type='radio'] {
-                    accent-color: var(--admin-primary);
+                    accent-color: #1d4ed8;
                 }
 
                 body.admin-glass .small-box,
@@ -803,8 +780,8 @@
 
                 body.admin-glass .swal-button {
                     border-radius: 4px;
-                    background: #2563eb;
-                    border: 1px solid #2563eb;
+                    background: #1d4ed8;
+                    border: 1px solid rgba(191, 219, 254, 0.32);
                 }
 
                 body.admin-glass .breadcrumb {
@@ -858,7 +835,7 @@
                     width: 48px;
                     height: 48px;
                     border-radius: 8px;
-                    border: 1px solid color-mix(in srgb, var(--admin-primary) 22%, rgba(148, 163, 184, 0.12));
+                    border: 1px solid rgba(148, 163, 184, 0.16);
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
@@ -897,10 +874,7 @@
                     border: 1px solid rgba(148, 163, 184, 0.12);
                     border-radius: 12px;
                     padding: 30px 30px 28px;
-                    background:
-                        radial-gradient(circle at top right, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 34%),
-                        radial-gradient(circle at left center, rgba(255, 255, 255, 0.04), transparent 38%),
-                        linear-gradient(160deg, rgba(14, 20, 34, 0.78), rgba(7, 12, 22, 0.88));
+                    background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.95));
                     box-shadow: 0 18px 36px rgba(2, 6, 23, 0.22);
                     margin-bottom: 24px;
                 }
@@ -909,9 +883,7 @@
                     content: '';
                     position: absolute;
                     inset: 0;
-                    background:
-                        linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 30%),
-                        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 36%);
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 50%);
                     pointer-events: none;
                 }
 
@@ -935,7 +907,7 @@
                     gap: 8px;
                     padding: 7px 12px;
                     border-radius: 4px;
-                    border: 1px solid color-mix(in srgb, var(--admin-primary) 16%, rgba(148, 163, 184, 0.1));
+                    border: 1px solid rgba(148, 163, 184, 0.16);
                     background: rgba(255, 255, 255, 0.03);
                     color: #cdd8ea;
                     font-size: 11px;
@@ -963,20 +935,13 @@
                     overflow: hidden;
                     border-radius: 10px;
                     border: 1px solid rgba(148, 163, 184, 0.12);
-                    background: linear-gradient(180deg, rgba(17, 24, 39, 0.76), rgba(9, 15, 27, 0.78));
+                    background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.94));
                     padding: 18px;
                     min-height: 122px;
                 }
 
                 .admin-stat-card::after {
-                    content: '';
-                    position: absolute;
-                    top: -35px;
-                    right: -20px;
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 999px;
-                    background: radial-gradient(circle, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 65%);
+                    display: none;
                 }
 
                 .admin-stat-card h3 {
@@ -1033,7 +998,7 @@
                     padding: 14px 16px;
                     border-radius: 8px;
                     border: 1px solid rgba(148, 163, 184, 0.08);
-                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(15, 23, 42, 0.18));
+                    background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.9));
                 }
 
                 .admin-health-item strong,
@@ -1121,11 +1086,11 @@
         <div class="wrapper">
             <header class="main-header">
                 <a href="{{ route('index') }}" class="logo">
-                    <span class="admin-brand-mark"><i class="fa fa-bolt"></i></span>
-                    <span class="admin-brand-stack">
-                        <span class="admin-brand-title">{{ config('app.name', 'Pterodactyl') }}</span>
-                        <span class="admin-brand-subtitle">Control Center</span>
-                    </span>
+                    @if($adminLogo !== '')
+                        <img src="{{ $adminLogo }}" alt="{{ config('app.name', 'Pterodactyl') }} logo" class="admin-brand-logo">
+                    @else
+                        <img src="/favicons/android-chrome-192x192.png" alt="{{ config('app.name', 'Pterodactyl') }} logo" class="admin-brand-logo">
+                    @endif
                 </a>
                 <nav class="navbar navbar-static-top">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">

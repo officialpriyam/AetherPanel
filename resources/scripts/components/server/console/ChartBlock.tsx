@@ -19,6 +19,16 @@ interface ChartBlockProps {
 export default ({ type, title, legend, usage, limit, inbound, outbound, children }: ChartBlockProps) => {
     const status = ServerContext.useStoreState((state) => state.status.value);
 
+    const shellStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(17, 24, 39, 0.78)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
+    const iconStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(37, 99, 235, 0.9)',
+    };
+
     const getIcon = () => {
         switch (type) {
             case 'cpu': return <ChipIcon className={'w-10'}/>;
@@ -30,7 +40,7 @@ export default ({ type, title, legend, usage, limit, inbound, outbound, children
 
     return (
     <>
-    <div className={'bg-gray-700 backdrop overflow-hidden rounded-box'}>
+    <div className={'backdrop overflow-hidden rounded-box'} style={shellStyle}>
         <div className={'px-6 pt-5 flex justify-between items-center'}>
             <div>
                 <span className={'text-gray-300'}>{title}:</span>
@@ -46,7 +56,7 @@ export default ({ type, title, legend, usage, limit, inbound, outbound, children
                     <span className={'text-gray-300 font-medium'}>{limit && '/ ' + limit}</span>
                 </div>
             </div>
-            <div className={'text-white bg-flash rounded-component w-16 h-16 flex items-center justify-center'}>
+            <div className={'text-white rounded-component w-16 h-16 flex items-center justify-center'} style={iconStyle}>
                 {getIcon()}
             </div>
         </div>
@@ -56,4 +66,3 @@ export default ({ type, title, legend, usage, limit, inbound, outbound, children
     </div>
     </>
 )};
-

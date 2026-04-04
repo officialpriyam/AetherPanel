@@ -6,7 +6,7 @@
     <title>404 | {{ config('app.name', 'Pterodactyl') }}</title>
     <style>
         :root {
-            --primary: #7C3AED;
+            --primary: #2563EB;
             --bgA: #020617;
             --bgB: #0f172a;
             --card: rgba(15, 23, 42, 0.72);

@@ -113,14 +113,14 @@ const NavigationLinks = styled.div`
         &::after {
             ${tw`absolute inset-0 z-[-1] opacity-0 duration-300 top-[100%]`}
             content: '';
-            background: linear-gradient(180deg, color-mix(in srgb, var(--gray700) 0%, transparent) 0%, color-mix(in srgb, var(--primary) 30%, transparent) 100%);
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.02) 0%, rgba(148, 163, 184, 0.14) 100%);
         }
 
         &.active {
-            ${tw`text-gray-50 border-flash`}
+            ${tw`text-gray-50 border-gray-400`}
 
             & > svg {
-                ${tw`text-flash`};
+                ${tw`text-gray-100`};
             }
 
             &::after {
@@ -164,6 +164,12 @@ const SubNavigation = () => {
         return !match ? 'n/a' : `${match.alias || ip(match.ip)}:${match.port}`;
     });
 
+    const topPanelStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
     useEffect(() => {
         if (!connected || !instance) {
             return;
@@ -189,9 +195,15 @@ const SubNavigation = () => {
     });
 
     return(
-        <div className={`relative px-4 z-10 ${layout == 3 ? 'bg-gray-700 backdrop !border-t-0 !border-r-0 !border-l-0' : 'pt-2'}`}>
+        <div
+            className={`relative px-4 z-10 ${layout == 3 ? 'backdrop !border-t-0 !border-r-0 !border-l-0' : 'pt-2'}`}
+            style={layout == 3 ? { backgroundColor: 'rgba(15, 23, 42, 0.82)', borderBottom: '1px solid rgba(148, 163, 184, 0.12)' } : undefined}
+        >
             {statsCards != 4 &&
-            <div className={`mx-auto w-full md:flex items-center justify-between max-w-[1200px] ${layout == 3 ? 'border-t border-gray-500 lg:pt-6 py-5' : 'bg-gray-700 backdrop px-6 py-5 rounded-box'}`}>
+            <div
+                className={`mx-auto w-full md:flex items-center justify-between max-w-[1200px] ${layout == 3 ? 'border-t border-gray-500 lg:pt-6 py-5' : 'backdrop px-6 py-5 rounded-box'}`}
+                style={layout == 3 ? undefined : topPanelStyle}
+            >
                 <div>
                     <div className={'flex items-center gap-x-3'}>
                         <p className={'text-lg font-semibold text-gray-50'}>{name}</p>

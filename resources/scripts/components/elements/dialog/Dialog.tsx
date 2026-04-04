@@ -72,8 +72,11 @@ export default ({
                         open={open}
                         onClose={onDialogClose}
                     >
-                        <div className={'fixed inset-0  black/50 z-40 backdrop-blur-md'} css={'backdrop-filter:blur(8px);'} />
-                        <div className={'fixed inset-0 overflow-y-auto z-50'}>
+                        <div
+                            className={'fixed inset-0 z-[140] bg-black/55 backdrop-blur-md'}
+                            css={'backdrop-filter:blur(8px);'}
+                        />
+                        <div className={'fixed inset-0 overflow-y-auto z-[150]'}>
                             <div
                                 ref={container}
                                 className={styles.container}

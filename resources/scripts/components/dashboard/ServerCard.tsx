@@ -57,10 +57,23 @@ export default ({ server }: { server: Server }) => {
         e.dataTransfer.setData('serverIdentifier', server.uuidShort);
     };
 
+    const cardStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.78)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
+    const manageButtonStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(30, 41, 59, 0.9)',
+        border: '1px solid rgba(148, 163, 184, 0.2)',
+        color: '#e5edf7',
+    };
+
     return (
         <>
         <div 
-            className="bg-gray-700 backdrop px-6 py-5 rounded-box cursor-grab active:cursor-grabbing"
+            className="backdrop px-6 py-5 rounded-box cursor-grab active:cursor-grabbing"
+            style={cardStyle}
             draggable={true}
             onDragStart={handleDragStart}
         >
@@ -152,7 +165,7 @@ export default ({ server }: { server: Server }) => {
                 </React.Fragment>
                 )}
             </div>
-            <Link to={`/server/${server.id}`} className={'text-secondary-50 bg-secondary-200 border border-secondary-100 hover:bg-secondary-100 rounded-component px-3 py-3 w-full block text-center duration-300'}>
+            <Link to={`/server/${server.id}`} className={'rounded-component px-3 py-3 w-full block text-center duration-300 hover:bg-gray-600/70'} style={manageButtonStyle}>
                 {t('manage-server', { ns: 'flash/dashboard'})}
             </Link>
         </div>

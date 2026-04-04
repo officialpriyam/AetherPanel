@@ -1,33 +1,30 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+const PORTAL_CLASS = 'flash-ui-portal-root';
+
 export default ({ children }: { children: React.ReactNode }) => {
-    const element = useRef<HTMLDivElement | null>(null);
+    const [element, setElement] = useState<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        const createAndAppendElement = () => {
-            const div = document.createElement('div');
-            div.id = 'modal-portal';
-            document.body.appendChild(div);
-            element.current = div;
-        };
-    
-        if (document.readyState === 'complete') {
-            createAndAppendElement();
-        } else {
-            document.addEventListener('DOMContentLoaded', createAndAppendElement);
-        }
-    
+        const div = document.createElement('div');
+        div.className = PORTAL_CLASS;
+        div.style.position = 'fixed';
+        div.style.inset = '0';
+        div.style.zIndex = '120';
+        div.style.pointerEvents = 'none';
+
+        document.body.appendChild(div);
+        setElement(div);
+
         return () => {
-            if (element.current) {
-                document.body.removeChild(element.current);
-            }
+            div.remove();
         };
     }, []);
 
-    if (!element.current) {
-        return null; 
+    if (!element) {
+        return null;
     }
-    
-    return createPortal(children, element.current);
+
+    return createPortal(children, element);
 };

@@ -10,7 +10,10 @@ import styled from 'styled-components/macro';
 import tw from 'twin.macro';
 
 const TopCardContainer = styled.div`
-    ${tw`bg-gray-700 rounded-box p-5 border border-gray-600 shadow-xl flex flex-wrap lg:flex-nowrap items-center gap-6`};
+    ${tw`rounded-box p-5 border shadow-xl flex flex-wrap lg:flex-nowrap items-center gap-6`};
+    background: rgba(17, 24, 39, 0.78);
+    border-color: rgba(148, 163, 184, 0.14);
+    box-shadow: 0 18px 42px rgba(2, 6, 23, 0.18);
 `;
 
 const StatItem = ({ label, usage, limit, icon: Icon, color }: { label: string; usage: string; limit: string | React.ReactNode; icon: any; color?: string }) => (
@@ -60,7 +63,7 @@ const ServerDetailsBlock = () => {
                 <div 
                     onClick={() => setIpRevealed(!ipRevealed)}
                     className={classNames(
-                        'cursor-pointer transition-all duration-300 rounded-xl px-4 py-3 bg-gray-800/60 border border-gray-600/50 hover:border-flash/60 flex items-center justify-center relative group overflow-hidden'
+                        'cursor-pointer transition-all duration-300 rounded-xl px-4 py-3 bg-gray-800/60 border border-gray-600/50 hover:border-gray-400/60 flex items-center justify-center relative group overflow-hidden'
                     )}
                 >
                     <p className={classNames(
@@ -71,7 +74,7 @@ const ServerDetailsBlock = () => {
                     </p>
                     {!ipRevealed && (
                         <div className={'absolute inset-0 flex items-center justify-center'}>
-                            <LuEye className={'w-4 h-4 text-flash opacity-0 group-hover:opacity-100 transition-opacity'} />
+                            <LuEye className={'w-4 h-4 text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity'} />
                             <span className={'ml-2 text-[10px] text-gray-400 font-bold uppercase group-hover:hidden'}>Reveal IP</span>
                         </div>
                     )}
@@ -95,7 +98,7 @@ const ServerDetailsBlock = () => {
                     usage={bytesToString(stats.memory)} 
                     limit={textLimits.memory} 
                     icon={LuMemoryStick} 
-                    color={'text-purple-400'}
+                    color={'text-blue-400'}
                 />
                 <StatItem 
                     label={'Disk'} 
@@ -147,4 +150,3 @@ const ServerDetailsBlock = () => {
 };
 
 export default ServerDetailsBlock;
-

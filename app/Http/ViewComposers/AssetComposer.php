@@ -136,7 +136,7 @@ class AssetComposer
                 'knowledge_base_url' => $this->settings->get('settings::flash:knowledge_base_url', ''),
 
                 /* COLORS */
-                'primary' => $this->settings->get('settings::flash:primary', '#6D28D9'),
+                'primary' => $this->settings->get('settings::flash:primary', '#2563EB'),
                 
                 'successText' => $this->settings->get('settings::flash:successText', '#E1FFD8'),
                 'successBorder' => $this->settings->get('settings::flash:successBorder', '#56AA2B'),
@@ -146,9 +146,9 @@ class AssetComposer
                 'dangerBorder' => $this->settings->get('settings::flash:dangerBorder', '#AA2A2A'),
                 'dangerBackground' => $this->settings->get('settings::flash:dangerBackground', '#8F1F20'),
 
-                'secondaryText' => $this->settings->get('settings::flash:secondaryText', '#B2B2C1'),
-                'secondaryBorder' => $this->settings->get('settings::flash:secondaryBorder', '#42425B'),
-                'secondaryBackground' => $this->settings->get('settings::flash:secondaryBackground', '#2B2B40'),
+                'secondaryText' => $this->settings->get('settings::flash:secondaryText', '#E2E8F0'),
+                'secondaryBorder' => $this->settings->get('settings::flash:secondaryBorder', '#475569'),
+                'secondaryBackground' => $this->settings->get('settings::flash:secondaryBackground', '#1E293B'),
 
                 'gray50' => $this->settings->get('settings::flash:gray50', '#F8FAFC'),
                 'gray100' => $this->settings->get('settings::flash:gray100', '#F1F5F9'),
@@ -162,7 +162,7 @@ class AssetComposer
                 'gray900' => $this->settings->get('settings::flash:gray900', '#020617'),
 
                 /* COLORS LIGHTMODE */
-                'lightmode_primary' => $this->settings->get('settings::flash:lightmode_primary', '#7C3AED'),
+                'lightmode_primary' => $this->settings->get('settings::flash:lightmode_primary', '#2563EB'),
                 
                 'lightmode_successText' => $this->settings->get('settings::flash:lightmode_successText', '#E1FFD8'),
                 'lightmode_successBorder' => $this->settings->get('settings::flash:lightmode_successBorder', '#56AA2B'),
@@ -172,19 +172,19 @@ class AssetComposer
                 'lightmode_dangerBorder' => $this->settings->get('settings::flash:lightmode_dangerBorder', '#AA2A2A'),
                 'lightmode_dangerBackground' => $this->settings->get('settings::flash:lightmode_dangerBackground', '#8F1F20'),
 
-                'lightmode_secondaryText' => $this->settings->get('settings::flash:lightmode_secondaryText', '#46464D'),
-                'lightmode_secondaryBorder' => $this->settings->get('settings::flash:lightmode_secondaryBorder', '#C0C0D3'),
-                'lightmode_secondaryBackground' => $this->settings->get('settings::flash:lightmode_secondaryBackground', '#A6A7BD'),
+                'lightmode_secondaryText' => $this->settings->get('settings::flash:lightmode_secondaryText', '#334155'),
+                'lightmode_secondaryBorder' => $this->settings->get('settings::flash:lightmode_secondaryBorder', '#CBD5E1'),
+                'lightmode_secondaryBackground' => $this->settings->get('settings::flash:lightmode_secondaryBackground', '#E2E8F0'),
 
-                'lightmode_gray50' => $this->settings->get('settings::flash:lightmode_gray50', '#141415'),
-                'lightmode_gray100' => $this->settings->get('settings::flash:lightmode_gray100', '#27272C'),
-                'lightmode_gray200' => $this->settings->get('settings::flash:lightmode_gray200', '#46464D'),
-                'lightmode_gray300' => $this->settings->get('settings::flash:lightmode_gray300', '#626272'),
-                'lightmode_gray400' => $this->settings->get('settings::flash:lightmode_gray400', '#757689'),
-                'lightmode_gray500' => $this->settings->get('settings::flash:lightmode_gray500', '#A6A7BD'),
-                'lightmode_gray600' => $this->settings->get('settings::flash:lightmode_gray600', '#C0C0D3'),
-                'lightmode_gray700' => $this->settings->get('settings::flash:lightmode_gray700', '#E7E7EF'),
-                'lightmode_gray800' => $this->settings->get('settings::flash:lightmode_gray800', '#F0F1F5'),
+                'lightmode_gray50' => $this->settings->get('settings::flash:lightmode_gray50', '#0F172A'),
+                'lightmode_gray100' => $this->settings->get('settings::flash:lightmode_gray100', '#1E293B'),
+                'lightmode_gray200' => $this->settings->get('settings::flash:lightmode_gray200', '#334155'),
+                'lightmode_gray300' => $this->settings->get('settings::flash:lightmode_gray300', '#475569'),
+                'lightmode_gray400' => $this->settings->get('settings::flash:lightmode_gray400', '#64748B'),
+                'lightmode_gray500' => $this->settings->get('settings::flash:lightmode_gray500', '#94A3B8'),
+                'lightmode_gray600' => $this->settings->get('settings::flash:lightmode_gray600', '#CBD5E1'),
+                'lightmode_gray700' => $this->settings->get('settings::flash:lightmode_gray700', '#E2E8F0'),
+                'lightmode_gray800' => $this->settings->get('settings::flash:lightmode_gray800', '#F1F5F9'),
                 'lightmode_gray900' => $this->settings->get('settings::flash:lightmode_gray900', '#FFFFFF'),
             ],
             'locale' => config('app.locale') ?? 'en',

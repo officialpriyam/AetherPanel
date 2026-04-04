@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useStoreState } from 'easy-peasy';
-import { ApplicationStore } from '@/state';
+import React, { useEffect, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import routes from '@/routers/routes';
 import Can from '@/components/elements/Can';
 import styled from 'styled-components/macro';
 import tw from 'twin.macro';
-import { NavLink, useRouteMatch, useHistory } from 'react-router-dom';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 import { DotsHorizontalIcon } from '@heroicons/react/solid';
-import { HomeIcon, TerminalIcon } from '@heroicons/react/outline';
+import { HomeIcon } from '@heroicons/react/outline';
 import { useTranslation } from 'react-i18next';
 
 const BarContainer = styled.div<{ position: 'top' | 'bottom' }>`
-    ${tw`fixed z-[40] flex items-center gap-x-3 px-5 py-3 bg-gray-700/80 backdrop-blur-xl border border-gray-500 rounded-box shadow-2xl transition-all duration-300 w-max max-w-[95vw]`};
+    ${tw`fixed z-[40] flex items-center gap-x-3 px-5 py-3 backdrop-blur-xl border rounded-box shadow-2xl transition-all duration-300 w-max max-w-[95vw]`};
+    background: rgba(15, 23, 42, 0.84);
+    border-color: rgba(148, 163, 184, 0.16);
     left: 50%;
     transform: translateX(-50%);
     ${props => props.position === 'top' ? tw`top-4` : tw`bottom-6`};
@@ -28,20 +28,21 @@ const IconLinkContainer = styled(NavLink)`
     }
 `;
 
-const DropdownContainer = styled.div<{ position: 'top' | 'bottom' }>`
+const DropdownContainer = styled.div<{ position: 'top' | 'bottom'; $open: boolean }>`
     ${tw`relative flex items-center justify-center`};
     .dots-btn {
-        ${tw`text-gray-300 hover:text-gray-100 p-2 rounded cursor-pointer hover:bg-gray-600/50`};
+        ${tw`text-gray-300 hover:text-gray-100 p-2 rounded cursor-pointer hover:bg-gray-600/50 transition-colors duration-200 border-0 bg-transparent`};
+        ${({ $open }) => $open && 'background: rgba(71, 85, 105, 0.78); color: rgb(243, 244, 246);'}
         svg {
             ${tw`w-5 h-5`};
         }
     }
     .dropdown-menu {
-        ${tw`absolute left-1/2 -translate-x-1/2 bg-gray-700/90 backdrop-blur-xl border border-gray-500 rounded-lg p-2 flex gap-2 hidden group-hover:flex shadow-xl z-[50]`};
+        ${tw`absolute left-1/2 -translate-x-1/2 backdrop-blur-xl border rounded-lg p-2 gap-2 shadow-xl z-[50]`};
+        display: ${({ $open }) => ($open ? 'flex' : 'none')};
+        background: rgba(15, 23, 42, 0.9);
+        border-color: rgba(148, 163, 184, 0.16);
         ${props => props.position === 'top' ? tw`top-full mt-3` : tw`bottom-full mb-3`};
-    }
-    &:hover .dropdown-menu {
-        display: flex;
     }
 `;
 
@@ -54,6 +55,8 @@ const FloatingBarLinks = ({ position }: Props) => {
     const match = useRouteMatch<{ id: string }>();
     const nestId = ServerContext.useStoreState((state) => state.server.data?.nestId);
     const eggId = ServerContext.useStoreState((state) => state.server.data?.eggId);
+    const [overflowOpen, setOverflowOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
     
     // Combine all server routes
     const allRoutes = [
@@ -74,6 +77,32 @@ const FloatingBarLinks = ({ position }: Props) => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(() => {
+        if (!overflowOpen) {
+            return;
+        }
+
+        const onPointerDown = (event: MouseEvent) => {
+            if (!dropdownRef.current?.contains(event.target as Node)) {
+                setOverflowOpen(false);
+            }
+        };
+
+        const onEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setOverflowOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('keydown', onEscape);
+
+        return () => {
+            document.removeEventListener('mousedown', onPointerDown);
+            document.removeEventListener('keydown', onEscape);
+        };
+    }, [overflowOpen]);
+
     const to = (value: string) => {
         return `${match.url.replace(/\/*$/, '')}/${value.replace(/^\/+/, '')}`;
     };
@@ -88,7 +117,13 @@ const FloatingBarLinks = ({ position }: Props) => {
         if (!isRenderable) return null;
 
         const content = (
-            <IconLinkContainer to={to(route.path)} exact={route.exact} key={key} title={t(route.name)}>
+            <IconLinkContainer
+                to={to(route.path)}
+                exact={route.exact}
+                key={key}
+                title={t(route.name)}
+                onClick={() => setOverflowOpen(false)}
+            >
                 <route.icon />
             </IconLinkContainer>
         );
@@ -115,11 +150,17 @@ const FloatingBarLinks = ({ position }: Props) => {
             {visibleRoutes.map((route, i) => renderItem(route, `nav-${i}`))}
             
             {overflowRoutes.length > 0 && (
-                <DropdownContainer className="group" position={position}>
-                    <div className="dots-btn">
+                <DropdownContainer ref={dropdownRef} position={position} $open={overflowOpen}>
+                    <button
+                        type={'button'}
+                        className="dots-btn"
+                        aria-haspopup={'menu'}
+                        aria-expanded={overflowOpen}
+                        onClick={() => setOverflowOpen((open) => !open)}
+                    >
                         <DotsHorizontalIcon />
-                    </div>
-                    <div className="dropdown-menu">
+                    </button>
+                    <div className="dropdown-menu" role={'menu'}>
                         {overflowRoutes.map((route, i) => renderItem(route, `overflow-${i}`))}
                     </div>
                 </DropdownContainer>

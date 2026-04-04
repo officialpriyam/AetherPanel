@@ -49,17 +49,28 @@ const ServerSideCard = () => {
         return `${s}s`;
     };
 
+    const cardStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(17, 24, 39, 0.78)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+        boxShadow: '0 18px 42px rgba(2, 6, 23, 0.18)',
+    };
+
+    const addressStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(30, 41, 59, 0.88)',
+        border: '1px solid rgba(148, 163, 184, 0.14)',
+    };
+
     return (
         <div className={'flex flex-col gap-4 h-full'}>
             {/* Section 1: Network */}
-            <div className={'bg-gray-700 rounded-box p-5'}>
+            <div className={'rounded-box p-5'} style={cardStyle}>
                 <div className={'flex items-center gap-2 text-gray-400 mb-4'}>
-                    <GlobeIcon className={'w-4 h-4 text-flash'} />
+                    <GlobeIcon className={'w-4 h-4 text-gray-300'} />
                     <span className={'text-xs font-bold uppercase tracking-wider'}>Network</span>
                 </div>
                 <div className={'text-sm text-gray-400 mb-2'}>Server Address</div>
                 <CopyOnClick text={primaryIp}>
-                    <div className={'bg-gray-800/60 rounded-lg px-4 py-2.5 text-gray-100 font-mono text-sm font-medium cursor-pointer hover:bg-gray-600/50 transition-colors truncate'}>
+                    <div className={'rounded-lg px-4 py-2.5 text-gray-100 font-mono text-sm font-medium cursor-pointer hover:bg-gray-600/50 transition-colors truncate'} style={addressStyle}>
                         {primaryIp}
                     </div>
                 </CopyOnClick>
@@ -84,7 +95,7 @@ const ServerSideCard = () => {
             </div>
 
             {/* Section 2: Resources */}
-            <div className={'bg-gray-700 rounded-box p-5'}>
+            <div className={'rounded-box p-5'} style={cardStyle}>
                 <div className={'flex items-center gap-2 text-gray-400 mb-4'}>
                     <ChipIcon className={'w-4 h-4 text-cyan-400'} />
                     <span className={'text-xs font-bold uppercase tracking-wider'}>Resources</span>
@@ -133,7 +144,7 @@ const ServerSideCard = () => {
             </div>
 
             {/* Section 3: Network Usage */}
-            <div className={'bg-gray-700 rounded-box p-5'}>
+            <div className={'rounded-box p-5'} style={cardStyle}>
                 <div className={'flex items-center gap-2 text-gray-400 mb-4'}>
                     <GlobeIcon className={'w-4 h-4 text-emerald-400'} />
                     <span className={'text-xs font-bold uppercase tracking-wider'}>Network</span>

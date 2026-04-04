@@ -1,4 +1,4 @@
-@extends('layouts.flash', ['navbar' => 'colors', 'sideEditor' => false])
+﻿@extends('layouts.flash', ['navbar' => 'colors', 'sideEditor' => false])
 
 @section('title')
     Flash Colors
@@ -28,7 +28,7 @@
                         <label for="flash:primary">Premium color</label>
                         <div class="input-w-reset">
                             <input type="color" class="form-control" name="flash:primary" value="{{ old('flash:primary', $primary) }}" />
-                            <button type="button" data-name="flash:primary" data-value="#6D28D9">
+                            <button type="button" data-name="flash:primary" data-value="#2563eb">
                                 <i data-lucide="rotate-ccw"></i>
                             </button>
                         </div>
@@ -105,21 +105,21 @@
                             <label for="flash:secondaryText">Secondary text</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:secondaryText" value="{{ old('flash:secondaryText', $secondaryText) }}" />
-                                <button type="button" data-name="flash:secondaryText" data-value="#b2b2c1"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:secondaryText" data-value="#e2e8f0"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                         <div class="col-md-4 input-field">
                             <label for="flash:secondaryBorder">Secondary border</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:secondaryBorder" value="{{ old('flash:secondaryBorder', $secondaryBorder) }}" />
-                                <button type="button" data-name="flash:secondaryBorder" data-value="#42425b"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:secondaryBorder" data-value="#475569"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                         <div class="col-md-4 input-field">
                             <label for="flash:secondaryBackground">Secondary bg</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:secondaryBackground" value="{{ old('flash:secondaryBackground', $secondaryBackground) }}" />
-                                <button type="button" data-name="flash:secondaryBackground" data-value="#2b2b40"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:secondaryBackground" data-value="#1e293b"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                             <label for="flash:gray50">Gray 50</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray50" value="{{ old('flash:gray50', $gray50) }}" />
-                                <button type="button" data-name="flash:gray50" data-value="#f5f3ff"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray50" data-value="#f8fafc"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Lightest text</small>
                         </div>
@@ -143,7 +143,7 @@
                             <label for="flash:gray100">Gray 100</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray100" value="{{ old('flash:gray100', $gray100) }}" />
-                                <button type="button" data-name="flash:gray100" data-value="#ede9fe"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray100" data-value="#e2e8f0"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Light text</small>
                         </div>
@@ -151,7 +151,7 @@
                             <label for="flash:gray200">Gray 200</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray200" value="{{ old('flash:gray200', $gray200) }}" />
-                                <button type="button" data-name="flash:gray200" data-value="#ddd6fe"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray200" data-value="#cbd5e1"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Regular text</small>
                         </div>
@@ -159,7 +159,7 @@
                             <label for="flash:gray300">Gray 300</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray300" value="{{ old('flash:gray300', $gray300) }}" />
-                                <button type="button" data-name="flash:gray300" data-value="#c4b5fd"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray300" data-value="#94a3b8"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Sub text</small>
                         </div>
@@ -167,7 +167,7 @@
                             <label for="flash:gray400">Gray 400</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray400" value="{{ old('flash:gray400', $gray400) }}" />
-                                <button type="button" data-name="flash:gray400" data-value="#a78bfa"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray400" data-value="#64748b"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Small details</small>
                         </div>
@@ -175,7 +175,7 @@
                             <label for="flash:gray500">Gray 500</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray500" value="{{ old('flash:gray500', $gray500) }}" />
-                                <button type="button" data-name="flash:gray500" data-value="#3b2f5a"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray500" data-value="#475569"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Border color</small>
                         </div>
@@ -183,7 +183,7 @@
                             <label for="flash:gray600">Gray 600</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray600" value="{{ old('flash:gray600', $gray600) }}" />
-                                <button type="button" data-name="flash:gray600" data-value="#2c2340"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray600" data-value="#334155"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Input color</small>
                         </div> 
@@ -191,7 +191,7 @@
                             <label for="flash:gray700">Gray 700</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray700" value="{{ old('flash:gray700', $gray700) }}" />
-                                <button type="button" data-name="flash:gray700" data-value="#1b1528"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray700" data-value="#1e293b"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Box color</small>
                         </div>
@@ -199,7 +199,7 @@
                             <label for="flash:gray800">Gray 800</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray800" value="{{ old('flash:gray800', $gray800) }}" />
-                                <button type="button" data-name="flash:gray800" data-value="#120c1b"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray800" data-value="#0f172a"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Background color</small>
                         </div>
@@ -207,7 +207,7 @@
                             <label for="flash:gray900">Gray 900</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:gray900" value="{{ old('flash:gray900', $gray900) }}" />
-                                <button type="button" data-name="flash:gray900" data-value="#0b0812"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:gray900" data-value="#020617"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Darkest elements</small>
                         </div>
@@ -229,7 +229,7 @@
                         <label for="flash:lightmode_primary">Premium color</label>
                         <div class="input-w-reset">
                             <input type="color" class="form-control" name="flash:lightmode_primary" value="{{ old('flash:lightmode_primary', $lightmode_primary) }}" />
-                            <button type="button" data-name="flash:lightmode_primary" data-value="#7c3aed">
+                            <button type="button" data-name="flash:lightmode_primary" data-value="#2563eb">
                                 <i data-lucide="rotate-ccw"></i>
                             </button>
                         </div>
@@ -306,21 +306,21 @@
                             <label for="flash:lightmode_secondaryText">Secondary text</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_secondaryText" value="{{ old('flash:lightmode_secondaryText', $lightmode_secondaryText) }}" />
-                                <button type="button" data-name="flash:lightmode_secondaryText" data-value="#46464d"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_secondaryText" data-value="#334155"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                         <div class="col-md-4 input-field">
                             <label for="flash:lightmode_secondaryBorder">Secondary border</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_secondaryBorder" value="{{ old('flash:lightmode_secondaryBorder', $lightmode_secondaryBorder) }}" />
-                                <button type="button" data-name="flash:lightmode_secondaryBorder" data-value="#c0c0d3"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_secondaryBorder" data-value="#cbd5e1"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                         <div class="col-md-4 input-field">
                             <label for="flash:lightmode_secondaryBackground">Secondary bg</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_secondaryBackground" value="{{ old('flash:lightmode_secondaryBackground', $lightmode_secondaryBackground) }}" />
-                                <button type="button" data-name="flash:lightmode_secondaryBackground" data-value="#a6a7bd"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_secondaryBackground" data-value="#e2e8f0"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                         </div>
                     </div>
@@ -336,7 +336,7 @@
                             <label for="flash:lightmode_gray50">Gray 50</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray50" value="{{ old('flash:lightmode_gray50', $lightmode_gray50) }}" />
-                                <button type="button" data-name="flash:lightmode_gray50" data-value="#1b102a"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray50" data-value="#0f172a"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Lightest text</small>
                         </div>
@@ -344,7 +344,7 @@
                             <label for="flash:lightmode_gray100">Gray 100</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray100" value="{{ old('flash:lightmode_gray100', $lightmode_gray100) }}" />
-                                <button type="button" data-name="flash:lightmode_gray100" data-value="#2b1b3c"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray100" data-value="#1e293b"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Light text</small>
                         </div>
@@ -352,7 +352,7 @@
                             <label for="flash:lightmode_gray200">Gray 200</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray200" value="{{ old('flash:lightmode_gray200', $lightmode_gray200) }}" />
-                                <button type="button" data-name="flash:lightmode_gray200" data-value="#3a2552"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray200" data-value="#334155"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Regular text</small>
                         </div>
@@ -360,7 +360,7 @@
                             <label for="flash:lightmode_gray300">Gray 300</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray300" value="{{ old('flash:lightmode_gray300', $lightmode_gray300) }}" />
-                                <button type="button" data-name="flash:lightmode_gray300" data-value="#4b3266"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray300" data-value="#475569"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Sub text</small>
                         </div>
@@ -368,7 +368,7 @@
                             <label for="flash:lightmode_gray400">Gray 400</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray400" value="{{ old('flash:lightmode_gray400', $lightmode_gray400) }}" />
-                                <button type="button" data-name="flash:lightmode_gray400" data-value="#6b4a88"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray400" data-value="#64748b"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Small details</small>
                         </div>
@@ -376,7 +376,7 @@
                             <label for="flash:lightmode_gray500">Gray 500</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray500" value="{{ old('flash:lightmode_gray500', $lightmode_gray500) }}" />
-                                <button type="button" data-name="flash:lightmode_gray500" data-value="#a18ccb"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray500" data-value="#94a3b8"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Border color</small>
                         </div>
@@ -384,7 +384,7 @@
                             <label for="flash:lightmode_gray600">Gray 600</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray600" value="{{ old('flash:lightmode_gray600', $lightmode_gray600) }}" />
-                                <button type="button" data-name="flash:lightmode_gray600" data-value="#d6cef2"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray600" data-value="#cbd5e1"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Input color</small>
                         </div> 
@@ -392,7 +392,7 @@
                             <label for="flash:lightmode_gray700">Gray 700</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray700" value="{{ old('flash:lightmode_gray700', $lightmode_gray700) }}" />
-                                <button type="button" data-name="flash:lightmode_gray700" data-value="#eee9ff"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray700" data-value="#e2e8f0"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Box color</small>
                         </div>
@@ -400,7 +400,7 @@
                             <label for="flash:lightmode_gray800">Gray 800</label>
                             <div class="input-w-reset">
                                 <input type="color" class="form-control" name="flash:lightmode_gray800" value="{{ old('flash:lightmode_gray800', $lightmode_gray800) }}" />
-                                <button type="button" data-name="flash:lightmode_gray800" data-value="#f6f3ff"><i data-lucide="rotate-ccw"></i></button>
+                                <button type="button" data-name="flash:lightmode_gray800" data-value="#f1f5f9"><i data-lucide="rotate-ccw"></i></button>
                             </div>
                             <small class="color-margin">Background color</small>
                         </div>
@@ -453,3 +453,4 @@
     }
     </script>
 @endsection
+

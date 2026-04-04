@@ -32,7 +32,7 @@ const NavigationLinks = styled.div`
         &::after{
             ${tw`absolute inset-0 z-[-1] opacity-0 duration-300`}
             content: '';
-            background: linear-gradient(90deg, color-mix(in srgb, var(--gray700) 0%, transparent) 0%, color-mix(in srgb, var(--primary) 30%, transparent) 100%); 
+            background: linear-gradient(90deg, rgba(148, 163, 184, 0.03) 0%, rgba(148, 163, 184, 0.14) 100%);
         }
 
         &:hover,
@@ -95,8 +95,18 @@ const SideBar = ({ children, type }: Props) => {
         });
     };
 
+    const sidebarStyle: React.CSSProperties = {
+        backgroundColor: 'rgba(15, 23, 42, 0.84)',
+        borderRight: '1px solid rgba(148, 163, 184, 0.16)',
+        boxShadow: '18px 0 42px rgba(2, 6, 23, 0.16)',
+    };
+
+    const separatorStyle: React.CSSProperties = {
+        borderColor: 'rgba(148, 163, 184, 0.16)',
+    };
+
     return (
-    <div className={'w-[250px] shrink-0 bg-gray-700 h-screen overflow-y-auto md:flex hidden flex-col sticky top-0 backdrop border-t-0 border-b-0 border-l-0'}>
+    <div className={'w-[250px] shrink-0 h-screen overflow-y-auto md:flex hidden flex-col sticky top-0 backdrop border-t-0 border-b-0 border-l-0'} style={sidebarStyle}>
         <SpinnerOverlay visible={isLoggingOut} />
         <div className={'pt-3'}>
             <Link to={'/'} className='flex gap-x-2 items-center font-semibold text-lg text-gray-50 px-5 pt-2 pb-5'>
@@ -117,15 +127,15 @@ const SideBar = ({ children, type }: Props) => {
                     </NavLink>
                 )}
             </NavigationLinks>}
-            <hr className={'border-b border-gray-500 mx-5'}/>
+            <hr className={'border-b mx-5'} style={separatorStyle}/>
         </div>
         {children &&
         <NavigationLinks className={'pb-2'}>
             {children}
         </NavigationLinks>
         }
-        <div className="sticky bottom-0 bg-gray-700 pb-4 px-5 z-20 mt-auto backdrop-blur-xl">
-            <hr className={'border-b border-gray-500 mb-4'}/>
+        <div className="sticky bottom-0 pb-4 px-5 z-20 mt-auto backdrop-blur-xl" style={sidebarStyle}>
+            <hr className={'border-b mb-4'} style={separatorStyle}/>
             <div className="flex w-full justify-between items-center">
                 <Link to="/account" className="flex items-center gap-x-2">
                     <UserAvatar /> 

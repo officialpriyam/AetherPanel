@@ -12,7 +12,9 @@ const ToggleContainer = styled.div`
         ${tw`hidden`};
 
         &:checked + label {
-            ${tw`bg-flash border-flash shadow-none`};
+            background: rgba(71, 85, 105, 0.92);
+            border-color: rgba(148, 163, 184, 0.34);
+            box-shadow: none;
         }
 
         &:checked + label:before {

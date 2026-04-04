@@ -10,13 +10,13 @@ class PteroGPTSettingsRequest extends AdminFormRequest
     {
         return [
             'enabled' => 'sometimes|boolean',
-            'base_url' => 'required|url|max:255',
-            'api_key' => 'sometimes|nullable|string|max:255',
+            'provider' => 'required|in:openai,openrouter,gemini',
+            'api_key' => 'sometimes|nullable|string|max:2048',
             'model_mode' => 'required|in:fixed,list',
-            'model_fixed' => 'required|string|max:100',
+            'model_fixed' => 'required|string|max:150',
             'models_allowed' => 'required|json',
             'ui_mode' => 'required|in:panel,modal',
-            'system_prompt' => 'nullable|string|max:8000',
+            'system_prompt' => 'nullable|string|max:16000',
             'language' => 'required|in:en,fr,es,de,it,pt,nl,pl,ru,ja,zh',
             'limit_chat' => 'required|integer|min:1|max:10000',
             'limit_read' => 'required|integer|min:1|max:10000',

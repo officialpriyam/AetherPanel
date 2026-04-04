@@ -21,6 +21,8 @@ import tw from 'twin.macro';
 const buildLabel = (build: MinecraftVersionBuild): string =>
     build.buildNumber === 1 ? build.projectVersionId ?? String(build.buildNumber) : String(build.buildNumber);
 
+const providerKey = (value?: string | null): string => (value || '').toUpperCase();
+
 export default () => {
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
@@ -95,6 +97,25 @@ export default () => {
         [versionBuilds, selectedBuildId]
     );
 
+    const providerMap = useMemo(() => {
+        const map = new Map<string, MinecraftVersionProviderType>();
+        types.forEach((type) => map.set(providerKey(type.name), type));
+
+        return map;
+    }, [types]);
+
+    const activeProvider = useMemo(() => (
+        selectedType ? providerMap.get(providerKey(selectedType)) ?? types.find((type) => type.name === selectedType) ?? null : null
+    ), [selectedType, providerMap, types]);
+
+    const installedProvider = useMemo(() => {
+        if (!installed?.build?.type) {
+            return null;
+        }
+
+        return providerMap.get(providerKey(installed.build.type)) ?? null;
+    }, [installed, providerMap]);
+
     const visibleVersions = useMemo(() => {
         if (!versions) {
             return [];
@@ -102,6 +123,11 @@ export default () => {
 
         return versions.filter((row) => showSnapshots || row.type !== 'SNAPSHOT');
     }, [versions, showSnapshots]);
+
+    const releaseVersions = useMemo(
+        () => (versions || []).filter((row) => row.type !== 'SNAPSHOT').length,
+        [versions]
+    );
 
     const onInstall = async () => {
         if (!selectedBuild) {
@@ -139,31 +165,81 @@ export default () => {
             ) : (
                 <div className={`${addonStyles.shell} ${styles.shell}`}>
                     <header className={`${addonStyles.hero} ${styles.hero}`}>
-                        <span className={`${addonStyles.brand} ${styles.brand}`}>PriyxStudio Addons</span>
-                        <h2 className={addonStyles.title}>Minecraft Version Changer</h2>
-                        <p className={addonStyles.subtitle}>
-                            Pick a server type and install a different Minecraft build safely from this panel.
-                        </p>
+                        <div className={styles.heroLayout}>
+                            <div className={styles.heroCopy}>
+                                <span className={`${addonStyles.brand} ${styles.brand}`}>PriyxStudio Addons</span>
+                                <h2 className={`${addonStyles.title} ${styles.title}`}>Minecraft Version Changer</h2>
+                                <p className={addonStyles.subtitle}>
+                                    Switch Paper, Purpur, Forge, Fabric, or other server builds from one polished control
+                                    flow with provider logos, release context, and safer install choices.
+                                </p>
+                                <div className={styles.heroStats}>
+                                    <span className={`${addonStyles.tag} ${styles.tag}`}>Providers: {types.length}</span>
+                                    <span className={`${addonStyles.tag} ${styles.tag}`}>Release tracks: {releaseVersions}</span>
+                                    <span className={`${addonStyles.tag} ${styles.tag}`}>
+                                        {installed?.build ? `Installed: ${installed.build.type}` : 'Install not detected'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className={styles.heroPanel}>
+                                <div className={styles.heroPanelHeader}>
+                                    {installedProvider?.icon ? (
+                                        <img src={installedProvider.icon} alt={installedProvider.name} className={styles.providerLogoLarge} />
+                                    ) : (
+                                        <div className={styles.providerLogoFallbackLarge}>
+                                            {installed?.build?.type?.slice(0, 2) ?? 'MC'}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <p className={styles.kicker}>Current install</p>
+                                        <h3>{installed?.build?.versionId ?? installed?.build?.projectVersionId ?? 'Unknown build'}</h3>
+                                    </div>
+                                </div>
+                                <div className={styles.heroPanelMeta}>
+                                    <div>
+                                        <span>Provider</span>
+                                        <strong>{installed?.build?.type ?? 'Not detected'}</strong>
+                                    </div>
+                                    <div>
+                                        <span>Latest known build</span>
+                                        <strong>{installed?.latest ? buildLabel(installed.latest) : 'Unknown'}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </header>
 
-                    <section className={addonStyles.controls}>
-                        <div css={tw`flex flex-wrap gap-2`}>
-                            <span className={`${addonStyles.tag} ${styles.tag}`}>Providers: {types.length}</span>
-                            {installed ? (
-                                <>
-                                    <span className={`${addonStyles.tag} ${styles.tag} ${styles.tagSuccess}`}>
-                                        Installed: {installed.build.type}
-                                    </span>
-                                    <span className={`${addonStyles.tag} ${styles.tag}`}>
-                                        Current: {installed.build.versionId ?? installed.build.projectVersionId ?? 'Unknown'}
-                                    </span>
-                                </>
-                            ) : (
-                                <span className={`${addonStyles.tag} ${styles.tag} ${styles.tagWarn}`}>
-                                    No detected installed build
-                                </span>
-                            )}
-                        </div>
+                    <section className={styles.summaryStrip}>
+                        <article className={styles.summaryCard}>
+                            <span className={styles.summaryLabel}>Current channel</span>
+                            <strong className={styles.summaryValue}>
+                                {installed?.build?.type ?? 'Unknown'}
+                            </strong>
+                            <p className={styles.summaryCopy}>
+                                {installed?.build
+                                    ? `Build ${buildLabel(installed.build)} on ${installed.build.versionId ?? installed.build.projectVersionId ?? 'unknown version'}`
+                                    : 'No installed build could be detected from the running server jar yet.'}
+                            </p>
+                        </article>
+
+                        <article className={styles.summaryCard}>
+                            <span className={styles.summaryLabel}>Provider focus</span>
+                            <strong className={styles.summaryValue}>
+                                {activeProvider?.name ?? 'Choose a provider'}
+                            </strong>
+                            <p className={styles.summaryCopy}>
+                                {activeProvider?.description || 'Pick a provider card below to browse versions, builds, and release channels.'}
+                            </p>
+                        </article>
+
+                        <article className={styles.summaryCard}>
+                            <span className={styles.summaryLabel}>Snapshots</span>
+                            <strong className={styles.summaryValue}>{showSnapshots ? 'Visible' : 'Hidden'}</strong>
+                            <p className={styles.summaryCopy}>
+                                Keep this off for stable browsing, or enable it when you want preview builds in the list.
+                            </p>
+                        </article>
                     </section>
 
                     <section className={addonStyles.cardGrid}>
@@ -172,16 +248,22 @@ export default () => {
                                 {types.map((type) => (
                                     <article
                                         key={type.name}
-                                        className={`${addonStyles.card} ${styles.card}`}
+                                        className={`${addonStyles.card} ${styles.card} ${styles.providerCard}`}
                                         css={tw`cursor-pointer`}
                                         onClick={() => setSelectedType(type.name)}
                                     >
-                                        <div className={addonStyles.cardHeader}>
-                                            <div css={tw`min-w-0 flex-1`}>
+                                        <div className={`${addonStyles.cardHeader} ${styles.providerHeader}`}>
+                                            {type.icon ? (
+                                                <img src={type.icon} alt={type.name} className={`${addonStyles.cardIcon} ${styles.providerLogo}`} />
+                                            ) : (
+                                                <div className={styles.providerLogoFallback}>{type.name.slice(0, 2)}</div>
+                                            )}
+                                            <div className={styles.providerHeaderCopy}>
                                                 <h3 className={addonStyles.cardName}>{type.name}</h3>
                                                 <p className={addonStyles.cardSummary}>{type.description || 'No description available.'}</p>
                                             </div>
                                         </div>
+
                                         <div className={addonStyles.tagRow}>
                                             <span className={`${addonStyles.tag} ${styles.tag}`}>{type.builds} builds</span>
                                             <span className={`${addonStyles.tag} ${styles.tag}`}>MC versions: {type.versions.minecraft}</span>
@@ -192,9 +274,11 @@ export default () => {
                                                 <span className={`${addonStyles.tag} ${styles.tag} ${styles.tagWarn}`}>Deprecated</span>
                                             )}
                                         </div>
-                                        <div css={tw`mt-4`}>
-                                            <Button type={'button'} size={'xsmall'} className={styles.cardAction}>
-                                                Open Versions
+
+                                        <div className={styles.providerFooter}>
+                                            <span className={styles.providerLink}>{type.homepage || 'Catalog endpoint available'}</span>
+                                            <Button type={'button'} size={'xsmall'} className={styles.primaryAction}>
+                                                Browse Versions
                                             </Button>
                                         </div>
                                     </article>
@@ -202,32 +286,52 @@ export default () => {
                             </>
                         ) : (
                             <>
-                                <article className={`${addonStyles.card} ${styles.card}`}>
-                                    <div css={tw`flex items-center justify-between gap-3`}>
-                                        <div>
-                                            <h3 className={addonStyles.cardName}>{selectedType} Versions</h3>
-                                            <p className={addonStyles.cardSummary}>
-                                                Select a version to open available builds and install it.
-                                            </p>
+                                <article className={`${addonStyles.card} ${styles.card} ${styles.selectedProviderCard}`}>
+                                    <div className={styles.selectedProviderHeader}>
+                                        <div className={styles.selectedProviderIdentity}>
+                                            {activeProvider?.icon ? (
+                                                <img src={activeProvider.icon} alt={activeProvider.name} className={styles.providerLogoLarge} />
+                                            ) : (
+                                                <div className={styles.providerLogoFallbackLarge}>
+                                                    {selectedType.slice(0, 2)}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <p className={styles.kicker}>Active provider</p>
+                                                <h3 className={styles.selectedProviderTitle}>{selectedType}</h3>
+                                                <p className={styles.selectedProviderCopy}>
+                                                    {activeProvider?.description || 'Select a version below, then pick the build you want to install.'}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <Button
-                                            type={'button'}
-                                            isSecondary
-                                            size={'xsmall'}
-                                            onClick={() => setSelectedType(null)}
-                                            className={styles.cardAction}
-                                        >
-                                            Back
-                                        </Button>
+
+                                        <div className={styles.selectedProviderActions}>
+                                            <Button
+                                                type={'button'}
+                                                isSecondary
+                                                size={'xsmall'}
+                                                onClick={() => setSelectedType(null)}
+                                                className={styles.secondaryAction}
+                                            >
+                                                Back to Providers
+                                            </Button>
+                                        </div>
                                     </div>
-                                    <label css={tw`mt-4 flex items-center gap-2 text-xs text-gray-300`}>
-                                        <input
-                                            type={'checkbox'}
-                                            checked={showSnapshots}
-                                            onChange={(e) => setShowSnapshots(e.currentTarget.checked)}
-                                        />
-                                        Show snapshot versions
-                                    </label>
+
+                                    <div className={styles.selectedProviderMeta}>
+                                        <label className={styles.snapshotToggle}>
+                                            <input
+                                                type={'checkbox'}
+                                                checked={showSnapshots}
+                                                onChange={(e) => setShowSnapshots(e.currentTarget.checked)}
+                                            />
+                                            <span>Show snapshot tracks</span>
+                                        </label>
+                                        <div className={styles.selectedProviderStats}>
+                                            <span>{visibleVersions.length} visible versions</span>
+                                            <span>{versions?.length || 0} total tracks</span>
+                                        </div>
+                                    </div>
                                 </article>
 
                                 {versionRowsLoading || !versions ? (
@@ -236,29 +340,33 @@ export default () => {
                                     </div>
                                 ) : (
                                     visibleVersions.map((row) => (
-                                        <article key={`${row.version}_${row.latest.id}`} className={`${addonStyles.card} ${styles.card}`}>
-                                            <div className={addonStyles.cardHeader}>
+                                        <article key={`${row.version}_${row.latest.id}`} className={`${addonStyles.card} ${styles.card} ${styles.versionCard}`}>
+                                            <div className={styles.versionCardTop}>
                                                 <div>
-                                                    <h3 className={addonStyles.cardName}>{row.version}</h3>
-                                                    <p className={addonStyles.cardSummary}>{row.type || 'Release'} - {row.builds} builds</p>
+                                                    <p className={styles.kicker}>{row.type || 'Release Channel'}</p>
+                                                    <h3 className={styles.versionTitle}>{row.version}</h3>
+                                                    <p className={styles.versionCopy}>
+                                                        {row.builds} builds available for this Minecraft release.
+                                                    </p>
                                                 </div>
+                                                <span className={`${addonStyles.tag} ${styles.tag}`}>Latest: {buildLabel(row.latest)}</span>
                                             </div>
+
                                             <div className={addonStyles.tagRow}>
-                                                <span className={`${addonStyles.tag} ${styles.tag}`}>
-                                                    Latest build: {buildLabel(row.latest)}
-                                                </span>
+                                                <span className={`${addonStyles.tag} ${styles.tag}`}>Builds: {row.builds}</span>
                                                 {row.latest.experimental && (
-                                                    <span className={`${addonStyles.tag} ${styles.tag} ${styles.tagWarn}`}>Experimental</span>
+                                                    <span className={`${addonStyles.tag} ${styles.tag} ${styles.tagWarn}`}>Experimental latest</span>
                                                 )}
                                             </div>
-                                            <div css={tw`mt-4`}>
+
+                                            <div className={styles.versionCardFooter}>
                                                 <Button
                                                     type={'button'}
                                                     size={'xsmall'}
                                                     onClick={() => setSelectedVersion(row)}
-                                                    className={styles.cardAction}
+                                                    className={styles.primaryAction}
                                                 >
-                                                    Select
+                                                    Open Builds
                                                 </Button>
                                             </div>
                                         </article>
@@ -276,51 +384,63 @@ export default () => {
                 dismissable={!submitting}
                 showSpinnerOverlay={submitting}
             >
-                <h2 css={tw`text-xl font-semibold text-gray-100`}>
-                    Install {selectedType} {selectedVersion?.version}
-                </h2>
-                <p css={tw`text-xs text-gray-300 mt-1`}>
-                    Confirm the target build and choose if server files should be removed first.
-                </p>
-
-                {!versionBuilds ? (
-                    <div css={tw`py-8`}>
-                        <Spinner centered size={'large'} />
-                    </div>
-                ) : (
-                    <div css={tw`mt-4`}>
-                        <Select
-                            value={selectedBuildId ?? ''}
-                            onChange={(e) => setSelectedBuildId(Number(e.currentTarget.value))}
-                        >
-                            {versionBuilds.map((build) => (
-                                <option key={build.id} value={build.id}>
-                                    Build {buildLabel(build)} {build.experimental ? '(Experimental)' : '(Stable)'}
-                                </option>
-                            ))}
-                        </Select>
-
-                        <label css={tw`mt-4 flex items-start gap-2 text-xs text-gray-300`}>
-                            <input
-                                type={'checkbox'}
-                                checked={deleteFiles}
-                                onChange={(e) => setDeleteFiles(e.currentTarget.checked)}
-                            />
-                            Remove all server files before installing this version.
-                        </label>
-
-                        <div css={tw`mt-5 flex justify-end`}>
-                            <Button
-                                type={'button'}
-                                disabled={!selectedBuild || submitting}
-                                onClick={onInstall}
-                                className={styles.cardAction}
-                            >
-                                {submitting ? 'Installing...' : 'Install Version'}
-                            </Button>
+                <div className={styles.installModal}>
+                    <div className={styles.installModalHeader}>
+                        {activeProvider?.icon ? (
+                            <img src={activeProvider.icon} alt={activeProvider.name} className={styles.providerLogoLarge} />
+                        ) : (
+                            <div className={styles.providerLogoFallbackLarge}>{selectedType?.slice(0, 2) || 'MC'}</div>
+                        )}
+                        <div>
+                            <p className={styles.kicker}>Install target</p>
+                            <h2 className={styles.installTitle}>
+                                {selectedType} {selectedVersion?.version}
+                            </h2>
+                            <p className={styles.installCopy}>
+                                Choose the exact build below and decide if this install should clear current files first.
+                            </p>
                         </div>
                     </div>
-                )}
+
+                    {!versionBuilds ? (
+                        <div css={tw`py-8`}>
+                            <Spinner centered size={'large'} />
+                        </div>
+                    ) : (
+                        <div className={styles.installBody}>
+                            <Select
+                                value={selectedBuildId ?? ''}
+                                onChange={(e) => setSelectedBuildId(Number(e.currentTarget.value))}
+                            >
+                                {versionBuilds.map((build) => (
+                                    <option key={build.id} value={build.id}>
+                                        Build {buildLabel(build)} {build.experimental ? '(Experimental)' : '(Stable)'}
+                                    </option>
+                                ))}
+                            </Select>
+
+                            <label className={styles.installToggle}>
+                                <input
+                                    type={'checkbox'}
+                                    checked={deleteFiles}
+                                    onChange={(e) => setDeleteFiles(e.currentTarget.checked)}
+                                />
+                                <span>Remove all existing server files before installing this version.</span>
+                            </label>
+
+                            <div className={styles.installActions}>
+                                <Button
+                                    type={'button'}
+                                    disabled={!selectedBuild || submitting}
+                                    onClick={onInstall}
+                                    className={styles.primaryAction}
+                                >
+                                    {submitting ? 'Installing...' : 'Install Version'}
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </Modal>
         </ServerContentBlock>
     );

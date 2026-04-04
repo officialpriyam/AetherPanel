@@ -28,13 +28,58 @@
             {!! Theme::css('css/pterodactyl.css?t={cache-version}') !!}
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+            @php
+                $adminBackgroundImage = trim((string) ($siteConfiguration['flash']['backgroundImage'] ?? 'none'));
+                $adminBackgroundImageCss = $adminBackgroundImage === '' || $adminBackgroundImage === 'none'
+                    ? 'none'
+                    : (str_starts_with($adminBackgroundImage, 'url(') ? $adminBackgroundImage : "url({$adminBackgroundImage})");
+            @endphp
             <style>
                 body.admin-glass {
+                    --admin-primary: {{ $siteConfiguration['flash']['primary'] ?? '#6D28D9' }};
+                    --admin-gray-50: {{ $siteConfiguration['flash']['gray50'] ?? '#F8FAFC' }};
+                    --admin-gray-100: {{ $siteConfiguration['flash']['gray100'] ?? '#F1F5F9' }};
+                    --admin-gray-200: {{ $siteConfiguration['flash']['gray200'] ?? '#E2E8F0' }};
+                    --admin-gray-300: {{ $siteConfiguration['flash']['gray300'] ?? '#94A3B8' }};
+                    --admin-gray-400: {{ $siteConfiguration['flash']['gray400'] ?? '#64748B' }};
+                    --admin-gray-500: {{ $siteConfiguration['flash']['gray500'] ?? '#334155' }};
+                    --admin-gray-600: {{ $siteConfiguration['flash']['gray600'] ?? '#1E293B' }};
+                    --admin-gray-700: {{ $siteConfiguration['flash']['gray700-default'] ?? ($siteConfiguration['flash']['gray700'] ?? '#0F172A') }};
+                    --admin-gray-800: {{ $siteConfiguration['flash']['gray800'] ?? '#0B0F1A' }};
+                    --admin-gray-900: {{ $siteConfiguration['flash']['gray900'] ?? '#020617' }};
+                    --admin-success: {{ $siteConfiguration['flash']['successBorder'] ?? '#56AA2B' }};
+                    --admin-danger: {{ $siteConfiguration['flash']['dangerBorder'] ?? '#AA2A2A' }};
                     background:
-                        radial-gradient(circle at 0% 0%, rgba(67, 56, 202, 0.14), transparent 30%),
-                        radial-gradient(circle at 100% 10%, rgba(8, 145, 178, 0.08), transparent 26%),
-                        linear-gradient(180deg, #07111f 0%, #09131f 34%, #0b1220 100%);
+                        radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--admin-primary) 12%, transparent), transparent 30%),
+                        radial-gradient(circle at 100% 10%, color-mix(in srgb, var(--admin-gray-200) 7%, transparent), transparent 28%),
+                        linear-gradient(180deg, var(--admin-gray-900) 0%, color-mix(in srgb, var(--admin-gray-800) 85%, #030712) 35%, color-mix(in srgb, var(--admin-gray-700) 88%, #020617) 100%);
                     color: #dde6f3;
+                }
+
+                body.admin-glass::before {
+                    content: '';
+                    position: fixed;
+                    inset: 0;
+                    z-index: -2;
+                    background-image: {{ $adminBackgroundImageCss }};
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    opacity: 0.08;
+                    filter: blur(2px);
+                    transform: scale(1.03);
+                    pointer-events: none;
+                }
+
+                body.admin-glass::after {
+                    content: '';
+                    position: fixed;
+                    inset: 0;
+                    z-index: -1;
+                    background:
+                        linear-gradient(180deg, rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.72)),
+                        radial-gradient(circle at top, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 34%);
+                    pointer-events: none;
                 }
 
                 body.admin-glass .wrapper {
@@ -78,8 +123,8 @@
                     align-items: center;
                     justify-content: center;
                     color: #ffffff;
-                    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(14, 165, 233, 0.72));
-                    box-shadow: 0 18px 35px rgba(79, 70, 229, 0.28);
+                    background: linear-gradient(135deg, color-mix(in srgb, var(--admin-primary) 88%, white), color-mix(in srgb, var(--admin-primary) 48%, #0f172a));
+                    box-shadow: 0 18px 35px color-mix(in srgb, var(--admin-primary) 24%, transparent);
                     flex-shrink: 0;
                 }
 
@@ -179,7 +224,7 @@
                 body.admin-glass .main-sidebar {
                     width: 270px;
                     padding: 16px 14px 20px;
-                    background: rgba(7, 17, 31, 0.76) !important;
+                    background: color-mix(in srgb, var(--admin-gray-900) 84%, transparent) !important;
                     border-right: 1px solid rgba(148, 163, 184, 0.1) !important;
                     backdrop-filter: blur(22px);
                 }
@@ -206,7 +251,7 @@
                 body.admin-glass .sidebar-menu > li > a {
                     margin-bottom: 6px;
                     padding: 12px 14px;
-                    border-radius: 16px;
+                    border-radius: 8px;
                     display: flex;
                     align-items: center;
                     gap: 12px;
@@ -227,7 +272,7 @@
                 body.admin-glass .sidebar-menu > li > a:hover,
                 body.admin-glass .sidebar-menu > li.active > a {
                     color: #ffffff !important;
-                    background: rgba(255, 255, 255, 0.06) !important;
+                    background: color-mix(in srgb, var(--admin-gray-100) 6%, transparent) !important;
                     border-color: rgba(148, 163, 184, 0.12);
                     box-shadow: 0 12px 24px rgba(2, 6, 23, 0.22);
                 }
@@ -269,18 +314,33 @@
                 body.admin-glass .nav-tabs-custom,
                 body.admin-glass .callout,
                 body.admin-glass .alert {
-                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
-                    border-radius: 22px !important;
-                    background: linear-gradient(180deg, rgba(17, 24, 39, 0.82), rgba(11, 18, 32, 0.76)) !important;
-                    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.28) !important;
-                    backdrop-filter: blur(18px);
+                    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+                    border-radius: 12px !important;
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-gray-700) 88%, transparent), color-mix(in srgb, var(--admin-gray-800) 88%, transparent)) !important;
+                    box-shadow: 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                    backdrop-filter: blur(16px);
                     color: #dfe8f6 !important;
                 }
 
                 body.admin-glass .box-header,
-                body.admin-glass .nav-tabs-custom > .nav-tabs {
+                body.admin-glass .nav-tabs-custom > .nav-tabs,
+                body.admin-glass .box-footer {
                     border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
                     background: transparent !important;
+                }
+
+                body.admin-glass .box-header {
+                    padding: 18px 22px 16px !important;
+                }
+
+                body.admin-glass .box-body {
+                    padding: 20px 22px 22px !important;
+                }
+
+                body.admin-glass .box-footer {
+                    padding: 16px 22px 20px !important;
+                    border-top: 1px solid rgba(148, 163, 184, 0.08) !important;
+                    border-bottom: 0 !important;
                 }
 
                 body.admin-glass .box-title,
@@ -299,57 +359,211 @@
                 }
 
                 body.admin-glass .btn {
-                    border-radius: 999px !important;
-                    padding: 10px 16px;
-                    border: 1px solid rgba(148, 163, 184, 0.18);
-                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 6px !important;
+                    min-height: 40px;
+                    padding: 9px 14px;
+                    border: 1px solid rgba(148, 163, 184, 0.12);
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(15, 23, 42, 0.24));
                     color: #e7eef8 !important;
-                    box-shadow: 0 12px 24px rgba(2, 6, 23, 0.25);
+                    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.12);
                     font-weight: 600;
+                    line-height: 1.2;
                     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
                 }
 
                 body.admin-glass .btn:hover,
                 body.admin-glass .btn:focus {
                     transform: translateY(-1px);
-                    border-color: rgba(148, 163, 184, 0.28);
-                    box-shadow: 0 18px 28px rgba(2, 6, 23, 0.3);
+                    border-color: rgba(148, 163, 184, 0.22);
+                    box-shadow: 0 10px 20px rgba(2, 6, 23, 0.14);
                 }
 
-                body.admin-glass .btn-primary,
-                body.admin-glass .btn-success,
-                body.admin-glass .btn-warning {
-                    background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(14, 165, 233, 0.74)) !important;
-                    border-color: rgba(129, 140, 248, 0.36) !important;
+                body.admin-glass .btn-primary {
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 76%, white), color-mix(in srgb, var(--admin-primary) 68%, black)) !important;
+                    border-color: color-mix(in srgb, var(--admin-primary) 18%, white) !important;
                     color: #fff !important;
+                    box-shadow: 0 10px 20px color-mix(in srgb, var(--admin-primary) 12%, transparent);
+                }
+
+                body.admin-glass .btn-success {
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-success) 74%, white), color-mix(in srgb, var(--admin-success) 66%, black)) !important;
+                    border-color: color-mix(in srgb, var(--admin-success) 22%, white) !important;
+                    color: #fff !important;
+                    box-shadow: 0 10px 20px color-mix(in srgb, var(--admin-success) 10%, transparent);
+                }
+
+                body.admin-glass .btn-warning {
+                    background: linear-gradient(180deg, #bd7b2b, #8d5316) !important;
+                    border-color: rgba(245, 158, 11, 0.24) !important;
+                    color: #fff !important;
+                    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
+                }
+
+                body.admin-glass .btn-info {
+                    background: linear-gradient(180deg, #2376a7, #1a537f) !important;
+                    border-color: rgba(59, 130, 246, 0.22) !important;
+                    color: #fff !important;
+                    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
                 }
 
                 body.admin-glass .btn-danger {
-                    background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(239, 68, 68, 0.7)) !important;
-                    border-color: rgba(248, 113, 113, 0.3) !important;
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-danger) 78%, white), color-mix(in srgb, var(--admin-danger) 70%, black)) !important;
+                    border-color: color-mix(in srgb, var(--admin-danger) 22%, white) !important;
+                }
+
+                body.admin-glass .btn-default,
+                body.admin-glass .btn-link {
+                    color: var(--admin-gray-100) !important;
+                }
+
+                body.admin-glass .btn-sm {
+                    min-height: 34px;
+                    padding: 7px 12px;
+                    font-size: 12px;
+                    border-radius: 6px !important;
+                }
+
+                body.admin-glass .btn-xs {
+                    min-height: 28px;
+                    padding: 5px 10px;
+                    border-radius: 4px !important;
+                    font-size: 11px;
+                }
+
+                body.admin-glass .btn-group .btn {
+                    border-radius: 0 !important;
+                    margin-right: 8px;
+                }
+
+                body.admin-glass .btn-group .btn:last-child {
+                    margin-right: 0;
+                }
+
+                body.admin-glass .btn-group .btn.active,
+                body.admin-glass .btn-group .btn:active,
+                body.admin-glass .btn-group .open > .dropdown-toggle.btn {
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 88%, white), color-mix(in srgb, var(--admin-primary) 78%, black)) !important;
+                    border-color: color-mix(in srgb, var(--admin-primary) 24%, white) !important;
+                    box-shadow: 0 12px 26px color-mix(in srgb, var(--admin-primary) 18%, transparent) !important;
                 }
 
                 body.admin-glass .form-control,
                 body.admin-glass .select2-container--default .select2-selection--single,
                 body.admin-glass .select2-container--default .select2-selection--multiple {
                     height: auto;
-                    min-height: 46px;
-                    border-radius: 16px !important;
-                    border: 1px solid rgba(148, 163, 184, 0.14) !important;
-                    background: rgba(8, 15, 28, 0.72) !important;
-                    color: #e8eef8 !important;
-                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+                    min-height: 42px;
+                    border-radius: 6px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                    background: color-mix(in srgb, var(--admin-gray-900) 68%, transparent) !important;
+                    color: var(--admin-gray-100) !important;
+                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+                    padding: 10px 12px;
+                    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+                }
+
+                body.admin-glass .form-control::placeholder,
+                body.admin-glass input::placeholder,
+                body.admin-glass textarea::placeholder {
+                    color: #6e84a3 !important;
                 }
 
                 body.admin-glass textarea.form-control {
-                    min-height: 120px;
+                    min-height: 140px;
+                    line-height: 1.6;
                 }
 
                 body.admin-glass .form-control:focus,
                 body.admin-glass .select2-container--default.select2-container--focus .select2-selection--multiple,
                 body.admin-glass .select2-container--default.select2-container--open .select2-selection--single {
-                    border-color: rgba(129, 140, 248, 0.4) !important;
-                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12) !important;
+                    border-color: color-mix(in srgb, var(--admin-primary) 34%, white) !important;
+                    background: color-mix(in srgb, var(--admin-gray-900) 72%, transparent) !important;
+                    box-shadow: 0 0 0 4px color-mix(in srgb, var(--admin-primary) 12%, transparent) !important;
+                }
+
+                body.admin-glass .form-group label,
+                body.admin-glass .control-label {
+                    color: var(--admin-gray-100) !important;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    margin-bottom: 10px;
+                }
+
+                body.admin-glass .input-group-addon {
+                    border-radius: 6px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                    background: color-mix(in srgb, var(--admin-gray-800) 92%, transparent) !important;
+                    color: var(--admin-gray-300) !important;
+                }
+
+                body.admin-glass .panel,
+                body.admin-glass .panel-default,
+                body.admin-glass .panel-heading,
+                body.admin-glass .panel-body,
+                body.admin-glass .panel-footer,
+                body.admin-glass .well {
+                    border-color: rgba(148, 163, 184, 0.1) !important;
+                    background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(8, 13, 24, 0.76)) !important;
+                    color: #dfe8f6 !important;
+                    box-shadow: none !important;
+                }
+
+                body.admin-glass .panel,
+                body.admin-glass .well {
+                    border-radius: 10px !important;
+                }
+
+                body.admin-glass .panel-heading,
+                body.admin-glass .panel-footer {
+                    background: rgba(255, 255, 255, 0.02) !important;
+                }
+
+                body.admin-glass .box.box-primary,
+                body.admin-glass .box.box-success,
+                body.admin-glass .box.box-warning,
+                body.admin-glass .box.box-danger,
+                body.admin-glass .box.box-info {
+                    border-top: 1px solid rgba(148, 163, 184, 0.1) !important;
+                }
+
+                body.admin-glass .box.box-primary {
+                    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--admin-primary) 24%, transparent), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                }
+
+                body.admin-glass .box.box-success {
+                    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--admin-success) 24%, transparent), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                }
+
+                body.admin-glass .box.box-warning {
+                    box-shadow: inset 0 1px 0 rgba(245, 158, 11, 0.2), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                }
+
+                body.admin-glass .box.box-danger {
+                    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--admin-danger) 24%, transparent), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                }
+
+                body.admin-glass .box.box-info {
+                    box-shadow: inset 0 1px 0 rgba(59, 130, 246, 0.22), 0 16px 34px rgba(2, 6, 23, 0.22) !important;
+                }
+
+                body.admin-glass .nav-tabs-custom > .nav-tabs > li > a {
+                    border-radius: 6px;
+                    margin: 10px 8px 10px 0;
+                    padding: 10px 14px;
+                    color: var(--admin-gray-300) !important;
+                    border: 1px solid transparent !important;
+                }
+
+                body.admin-glass .nav-tabs-custom > .nav-tabs > li.active > a,
+                body.admin-glass .nav-tabs-custom > .nav-tabs > li > a:hover {
+                    background: color-mix(in srgb, var(--admin-gray-100) 6%, transparent) !important;
+                    color: var(--admin-gray-50) !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                }
+
+                body.admin-glass .nav-tabs-custom > .tab-content {
+                    background: transparent !important;
                 }
 
                 body.admin-glass table,
@@ -363,6 +577,252 @@
                 body.admin-glass .table > tbody > tr > td {
                     border-color: rgba(148, 163, 184, 0.08) !important;
                     background: transparent !important;
+                }
+
+                body.admin-glass .table > tbody > tr:hover > td {
+                    background: color-mix(in srgb, var(--admin-gray-100) 4%, transparent) !important;
+                }
+
+                body.admin-glass .box-tools {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+
+                body.admin-glass .box-tools .btn {
+                    margin-left: 0 !important;
+                }
+
+                body.admin-glass .box-tools.search01,
+                body.admin-glass .search01 {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                }
+
+                body.admin-glass .search01 .form-control,
+                body.admin-glass .box-tools.search01 .form-control,
+                body.admin-glass .box-tools .form-control {
+                    min-width: 220px;
+                }
+
+                body.admin-glass .label {
+                    border-radius: 4px;
+                    padding: 5px 9px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.05em;
+                }
+
+                body.admin-glass .alert-success,
+                body.admin-glass .callout.callout-success {
+                    background: rgba(34, 197, 94, 0.1) !important;
+                    border-color: rgba(34, 197, 94, 0.18) !important;
+                    color: #b9f5cf !important;
+                }
+
+                body.admin-glass .alert-info,
+                body.admin-glass .callout.callout-info {
+                    background: rgba(59, 130, 246, 0.1) !important;
+                    border-color: rgba(59, 130, 246, 0.16) !important;
+                    color: #cfe5ff !important;
+                }
+
+                body.admin-glass .alert-warning,
+                body.admin-glass .callout.callout-warning {
+                    background: rgba(245, 158, 11, 0.12) !important;
+                    border-color: rgba(245, 158, 11, 0.18) !important;
+                    color: #ffe2a4 !important;
+                }
+
+                body.admin-glass .alert-danger,
+                body.admin-glass .callout.callout-danger {
+                    background: rgba(239, 68, 68, 0.11) !important;
+                    border-color: rgba(239, 68, 68, 0.18) !important;
+                    color: #fecaca !important;
+                }
+
+                body.admin-glass .pagination > li > a,
+                body.admin-glass .pagination > li > span {
+                    margin-right: 8px;
+                    border-radius: 4px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+                    background: rgba(255, 255, 255, 0.03) !important;
+                    color: #dbe7f6 !important;
+                }
+
+                body.admin-glass .pagination > .active > a,
+                body.admin-glass .pagination > .active > span,
+                body.admin-glass .pagination > li > a:hover,
+                body.admin-glass .pagination > li > span:hover {
+                    background: color-mix(in srgb, var(--admin-primary) 16%, var(--admin-gray-800)) !important;
+                    border-color: color-mix(in srgb, var(--admin-primary) 20%, white) !important;
+                    color: #ffffff !important;
+                }
+
+                body.admin-glass .modal-content {
+                    border-radius: 8px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                    background: linear-gradient(180deg, rgba(15, 21, 33, 0.98), rgba(9, 13, 22, 0.99)) !important;
+                    box-shadow: 0 18px 38px rgba(2, 6, 23, 0.28) !important;
+                    color: #dfe8f6 !important;
+                    overflow: hidden;
+                }
+
+                body.admin-glass .modal-header,
+                body.admin-glass .modal-footer {
+                    border-color: rgba(148, 163, 184, 0.1) !important;
+                    background: rgba(255, 255, 255, 0.015) !important;
+                }
+
+                body.admin-glass .modal-body {
+                    padding: 18px 20px !important;
+                }
+
+                body.admin-glass .modal-dialog {
+                    margin-top: 72px;
+                }
+
+                body.admin-glass .modal-backdrop.in {
+                    opacity: 0.82;
+                }
+
+                body.admin-glass .modal-title {
+                    color: #f8fafc !important;
+                    font-weight: 700;
+                }
+
+                body.admin-glass .close {
+                    color: #cbd5e1 !important;
+                    opacity: 0.85;
+                    text-shadow: none !important;
+                }
+
+                body.admin-glass .select2-dropdown {
+                    border-radius: 6px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                    background: linear-gradient(180deg, rgba(16, 23, 36, 0.98), rgba(8, 13, 24, 0.99)) !important;
+                    box-shadow: 0 20px 34px rgba(2, 6, 23, 0.28) !important;
+                    overflow: hidden;
+                }
+
+                body.admin-glass .select2-search--dropdown .select2-search__field {
+                    border-radius: 4px !important;
+                    border: 1px solid rgba(148, 163, 184, 0.12) !important;
+                    background: rgba(255, 255, 255, 0.03) !important;
+                    color: #dfe8f6 !important;
+                }
+
+                body.admin-glass .select2-results__option {
+                    color: #dfe8f6 !important;
+                    padding: 10px 14px;
+                }
+
+                body.admin-glass .select2-results__option--highlighted[aria-selected],
+                body.admin-glass .select2-results__option[aria-selected=true] {
+                    background: color-mix(in srgb, var(--admin-primary) 14%, var(--admin-gray-800)) !important;
+                    color: #ffffff !important;
+                }
+
+                body.admin-glass .checkbox,
+                body.admin-glass .radio {
+                    color: #dfe8f6 !important;
+                }
+
+                body.admin-glass .checkbox-inline,
+                body.admin-glass .radio-inline,
+                body.admin-glass .checkbox label,
+                body.admin-glass .radio label {
+                    color: #dfe8f6 !important;
+                    font-weight: 500;
+                }
+
+                body.admin-glass input[type='checkbox'],
+                body.admin-glass input[type='radio'] {
+                    accent-color: var(--admin-primary);
+                }
+
+                body.admin-glass .small-box,
+                body.admin-glass .info-box {
+                    overflow: hidden;
+                }
+
+                body.admin-glass .small-box > .inner,
+                body.admin-glass .info-box-content {
+                    position: relative;
+                    z-index: 1;
+                }
+
+                body.admin-glass .small-box .icon,
+                body.admin-glass .info-box-icon {
+                    color: rgba(255, 255, 255, 0.14) !important;
+                }
+
+                body.admin-glass .small-box-footer {
+                    border-top: 1px solid rgba(148, 163, 184, 0.08);
+                    background: rgba(255, 255, 255, 0.02) !important;
+                    color: #dfe8f6 !important;
+                }
+
+                body.admin-glass .table-responsive {
+                    border: 0 !important;
+                }
+
+                body.admin-glass .table > thead > tr > th {
+                    color: #90a6c2 !important;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }
+
+                body.admin-glass .table > tbody > tr > td {
+                    vertical-align: middle;
+                }
+
+                body.admin-glass .swal-modal {
+                    border-radius: 8px;
+                    border: 1px solid rgba(148, 163, 184, 0.12);
+                    background: linear-gradient(180deg, rgba(16, 23, 36, 0.96), rgba(8, 13, 24, 0.98));
+                    box-shadow: 0 18px 38px rgba(2, 6, 23, 0.28);
+                }
+
+                body.admin-glass .swal-title,
+                body.admin-glass .swal-text {
+                    color: #dfe8f6;
+                }
+
+                body.admin-glass .swal-button {
+                    border-radius: 4px;
+                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 76%, white), color-mix(in srgb, var(--admin-primary) 68%, black));
+                }
+
+                body.admin-glass .breadcrumb {
+                    background: transparent !important;
+                    padding: 0;
+                    margin-top: 8px;
+                    color: var(--admin-gray-400);
+                }
+
+                body.admin-glass .breadcrumb > .active,
+                body.admin-glass .breadcrumb a {
+                    color: var(--admin-gray-300) !important;
+                }
+
+                body.admin-glass .content-header > h1 {
+                    font-size: 28px;
+                    font-weight: 700;
+                    letter-spacing: -0.02em;
+                }
+
+                body.admin-glass .content-header > h1 > small {
+                    display: block;
+                    margin-top: 6px;
+                    color: var(--admin-gray-300) !important;
+                    font-size: 13px;
+                    font-weight: 500;
                 }
 
                 body.admin-glass .main-footer {
@@ -389,17 +849,17 @@
                 .admin-terminal-icon {
                     width: 48px;
                     height: 48px;
-                    border-radius: 16px;
-                    border: 1px solid rgba(129, 140, 248, 0.32);
+                    border-radius: 8px;
+                    border: 1px solid color-mix(in srgb, var(--admin-primary) 22%, rgba(148, 163, 184, 0.12));
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    background: linear-gradient(135deg, rgba(79, 70, 229, 0.24), rgba(14, 165, 233, 0.14));
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.24));
                     color: #d9e4ff;
                     font-size: 13px;
                     font-weight: 700;
                     letter-spacing: 0.08em;
-                    box-shadow: 0 18px 35px rgba(59, 130, 246, 0.16);
+                    box-shadow: 0 18px 35px rgba(2, 6, 23, 0.18);
                 }
 
                 .admin-terminal-title h2 {
@@ -427,13 +887,13 @@
                     position: relative;
                     overflow: hidden;
                     border: 1px solid rgba(148, 163, 184, 0.12);
-                    border-radius: 28px;
+                    border-radius: 12px;
                     padding: 30px 30px 28px;
                     background:
-                        radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 30%),
-                        radial-gradient(circle at left center, rgba(79, 70, 229, 0.16), transparent 40%),
-                        linear-gradient(160deg, rgba(14, 20, 34, 0.84), rgba(9, 15, 27, 0.9));
-                    box-shadow: 0 28px 60px rgba(2, 6, 23, 0.34);
+                        radial-gradient(circle at top right, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 34%),
+                        radial-gradient(circle at left center, rgba(255, 255, 255, 0.04), transparent 38%),
+                        linear-gradient(160deg, rgba(14, 20, 34, 0.78), rgba(7, 12, 22, 0.88));
+                    box-shadow: 0 18px 36px rgba(2, 6, 23, 0.22);
                     margin-bottom: 24px;
                 }
 
@@ -466,9 +926,9 @@
                     align-items: center;
                     gap: 8px;
                     padding: 7px 12px;
-                    border-radius: 999px;
-                    border: 1px solid rgba(129, 140, 248, 0.2);
-                    background: rgba(255, 255, 255, 0.04);
+                    border-radius: 4px;
+                    border: 1px solid color-mix(in srgb, var(--admin-primary) 16%, rgba(148, 163, 184, 0.1));
+                    background: rgba(255, 255, 255, 0.03);
                     color: #cdd8ea;
                     font-size: 11px;
                     font-weight: 700;
@@ -493,7 +953,7 @@
                 .admin-stat-card {
                     position: relative;
                     overflow: hidden;
-                    border-radius: 22px;
+                    border-radius: 10px;
                     border: 1px solid rgba(148, 163, 184, 0.12);
                     background: linear-gradient(180deg, rgba(17, 24, 39, 0.76), rgba(9, 15, 27, 0.78));
                     padding: 18px;
@@ -508,7 +968,7 @@
                     width: 100px;
                     height: 100px;
                     border-radius: 999px;
-                    background: radial-gradient(circle, rgba(79, 70, 229, 0.15), transparent 65%);
+                    background: radial-gradient(circle, color-mix(in srgb, var(--admin-primary) 10%, transparent), transparent 65%);
                 }
 
                 .admin-stat-card h3 {
@@ -563,9 +1023,9 @@
 
                 .admin-health-item {
                     padding: 14px 16px;
-                    border-radius: 18px;
+                    border-radius: 8px;
                     border: 1px solid rgba(148, 163, 184, 0.08);
-                    background: rgba(255, 255, 255, 0.04);
+                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(15, 23, 42, 0.18));
                 }
 
                 .admin-health-item strong,
@@ -589,7 +1049,7 @@
                     align-items: center;
                     gap: 8px;
                     padding: 8px 12px;
-                    border-radius: 999px;
+                    border-radius: 4px;
                     background: rgba(34, 197, 94, 0.12);
                     border: 1px solid rgba(34, 197, 94, 0.18);
                     color: #b5f4c7;
@@ -605,7 +1065,7 @@
                 }
 
                 .admin-link-row .btn {
-                    min-width: 170px;
+                    min-width: 140px;
                     justify-content: center;
                 }
 

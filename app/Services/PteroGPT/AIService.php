@@ -15,6 +15,7 @@ class AIService
 
     public function __construct(
         private SettingsRepositoryInterface $settings,
+        private ProviderService $providerService,
         private PromptBuilder $promptBuilder,
         private PromptSanitizer $sanitizer,
         private RateLimiter $rateLimiter,
@@ -30,11 +31,16 @@ class AIService
     {
         $modelMode = (string) $this->settings->get('pterogpt::model_mode', 'fixed');
         $uiMode = (string) $this->settings->get('pterogpt::ui_mode', 'panel');
+        $provider = $this->providerService->normalize(
+            (string) $this->settings->get('pterogpt::provider', ''),
+            (string) $this->settings->get('pterogpt::base_url', '')
+        );
 
         $config = [
             'enabled' => $this->isEnabled(),
             'ui_mode' => in_array($uiMode, ['panel', 'modal'], true) ? $uiMode : 'panel',
             'model_mode' => in_array($modelMode, ['fixed', 'list'], true) ? $modelMode : 'fixed',
+            'provider' => $provider,
         ];
 
         if ($config['model_mode'] === 'fixed') {
@@ -45,6 +51,22 @@ class AIService
         }
 
         return $config;
+    }
+
+    /**
+     * @throws DisplayException
+     */
+    public function listModels(?string $provider = null, ?string $overrideApiKey = null): array
+    {
+        $resolvedProvider = $this->providerService->normalize(
+            $provider,
+            (string) $this->settings->get('pterogpt::base_url', '')
+        );
+
+        return $this->providerService->fetchModels(
+            $resolvedProvider,
+            $overrideApiKey !== null && trim($overrideApiKey) !== '' ? trim($overrideApiKey) : $this->getApiKey()
+        );
     }
 
     /**
@@ -126,25 +148,20 @@ class AIService
             return $this->client;
         }
 
-        $baseUrl = (string) $this->settings->get('pterogpt::base_url', 'https://api.openai.com/v1');
-        $encryptedKey = (string) $this->settings->get('pterogpt::api_key', '');
-
-        if ($encryptedKey === '') {
-            throw new DisplayException('The AI provider API key is not configured.');
-        }
-
-        try {
-            $apiKey = decrypt($encryptedKey);
-        } catch (\Throwable) {
-            throw new DisplayException('Unable to decrypt the AI provider API key.');
-        }
+        $provider = $this->providerService->normalize(
+            (string) $this->settings->get('pterogpt::provider', ''),
+            (string) $this->settings->get('pterogpt::base_url', '')
+        );
+        $apiKey = $this->getApiKey();
 
         $this->client = new Client([
-            'base_uri' => rtrim($baseUrl, '/') . '/',
+            'base_uri' => rtrim($this->providerService->endpointFor($provider), '/') . '/',
             'headers' => [
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
+                'HTTP-Referer' => (string) config('app.url'),
+                'X-Title' => (string) config('app.name', 'Pterodactyl'),
             ],
             'timeout' => 60,
         ]);
@@ -202,5 +219,23 @@ class AIService
         return [
             'response' => trim($message),
         ];
+    }
+
+    /**
+     * @throws DisplayException
+     */
+    private function getApiKey(): string
+    {
+        $encryptedKey = (string) $this->settings->get('pterogpt::api_key', '');
+
+        if ($encryptedKey === '') {
+            throw new DisplayException('The AI provider API key is not configured.');
+        }
+
+        try {
+            return (string) decrypt($encryptedKey);
+        } catch (\Throwable) {
+            throw new DisplayException('Unable to decrypt the AI provider API key.');
+        }
     }
 }

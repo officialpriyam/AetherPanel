@@ -4,6 +4,7 @@ export interface PteroGPTConfig {
     enabled: boolean;
     ui_mode: 'panel' | 'modal';
     model_mode: 'fixed' | 'list';
+    provider: 'openai' | 'openrouter' | 'gemini';
     model?: string;
     models?: string[];
 }
@@ -31,13 +32,13 @@ export interface ChatResponse {
 }
 
 export const getConfig = async (uuid: string): Promise<PteroGPTConfig> => {
-    const { data } = await http.get(`/api/client/servers/${uuid}/pterogpt/config`);
+    const { data } = await http.get(`/api/client/servers/${uuid}/priyxstudioai/config`);
 
     return data.data;
 };
 
 export const getLimits = async (uuid: string): Promise<PteroGPTLimits> => {
-    const { data } = await http.get(`/api/client/servers/${uuid}/pterogpt/limits`);
+    const { data } = await http.get(`/api/client/servers/${uuid}/priyxstudioai/limits`);
 
     return data.data;
 };
@@ -48,7 +49,7 @@ export const sendChat = async (
     conversationHistory: ConversationMessage[],
     model?: string
 ): Promise<ChatResponse> => {
-    const { data } = await http.post(`/api/client/servers/${uuid}/pterogpt/chat`, {
+    const { data } = await http.post(`/api/client/servers/${uuid}/priyxstudioai/chat`, {
         message,
         conversation_history: conversationHistory,
         model,

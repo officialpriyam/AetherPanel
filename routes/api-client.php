@@ -124,11 +124,14 @@ Route::group([
         Route::delete('/delete/{id}', [Client\Servers\SubdomainController::class, 'delete']);
     });
 
-    Route::group(['prefix' => '/pterogpt'], function () {
+    $priyxStudioAiRoutes = function () {
         Route::get('/config', [Client\Servers\PteroGPTController::class, 'config']);
         Route::get('/limits', [Client\Servers\PteroGPTController::class, 'limits']);
         Route::post('/chat', [Client\Servers\PteroGPTController::class, 'chat']);
-    });
+    };
+
+    Route::group(['prefix' => '/priyxstudioai'], $priyxStudioAiRoutes);
+    Route::group(['prefix' => '/pterogpt'], $priyxStudioAiRoutes);
 
     Route::group(['prefix' => '/splitted'], function () {
         Route::get('/', [Client\Servers\SplitController::class, 'index']);

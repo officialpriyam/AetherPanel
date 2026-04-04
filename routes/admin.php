@@ -110,17 +110,19 @@ Route::group(['prefix' => 'settings'], function () {
     Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
     Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
     Route::get('/subdomain', [Admin\Settings\SubdomainController::class, 'index'])->name('admin.settings.subdomain');
-    Route::get('/pterogpt', [Admin\Settings\PteroGPTController::class, 'index'])->name('admin.settings.pterogpt');
+    Route::get('/pterogpt', fn () => redirect()->route('admin.settings.pterogpt'));
+    Route::get('/priyxstudioai', [Admin\Settings\PteroGPTController::class, 'index'])->name('admin.settings.pterogpt');
 
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
     Route::post('/subdomain/domains', [Admin\Settings\SubdomainController::class, 'storeDomain'])->name('admin.settings.subdomain.domains.store');
+    Route::post('/priyxstudioai/models', [Admin\Settings\PteroGPTController::class, 'models'])->name('admin.settings.pterogpt.models');
 
     Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
     Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
     Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
     Route::patch('/subdomain', [Admin\Settings\SubdomainController::class, 'updateSettings'])->name('admin.settings.subdomain.update');
     Route::patch('/subdomain/domains/{domain}', [Admin\Settings\SubdomainController::class, 'updateDomain'])->name('admin.settings.subdomain.domains.update');
-    Route::patch('/pterogpt', [Admin\Settings\PteroGPTController::class, 'update'])->name('admin.settings.pterogpt.update');
+    Route::patch('/priyxstudioai', [Admin\Settings\PteroGPTController::class, 'update'])->name('admin.settings.pterogpt.update');
 
     Route::delete('/subdomain/domains/{domain}', [Admin\Settings\SubdomainController::class, 'deleteDomain'])->name('admin.settings.subdomain.domains.delete');
 });

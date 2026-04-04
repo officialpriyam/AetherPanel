@@ -27,7 +27,7 @@ export default () => {
 
     return (
         <>
-        <div className={'min-h-screen flex h-full bg-center bg-no-repeat bg-cover bg-gray-800 flash-bg'}>
+        <div className={'min-h-screen flex h-full bg-center bg-no-repeat bg-cover'}>
             {useIconSidebar ? <SideBarIcon /> : <SideBar />}
             <div className="w-full">
                 <NavigationBar />

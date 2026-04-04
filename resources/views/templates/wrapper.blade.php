@@ -70,7 +70,7 @@
                 if (str_starts_with($value, 'url(')) {
                     return $value;
                 }
-                return "url({$value})";
+                return 'url(' . json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . ')';
             };
             $bgImageCss = $normalizeBg($bgImage);
             $bgImageLightCss = $normalizeBg($bgImageLight);
@@ -225,7 +225,9 @@
 
             .flash-bg {
                 position: relative;
-                background: transparent;
+                isolation: isolate;
+                z-index: 0;
+                background: transparent !important;
             }
 
             .flash-bg::before {
@@ -239,6 +241,19 @@
                 filter: blur(var(--image-blur, 0px));
                 transform: scale(1.05);
                 z-index: -2;
+                opacity: 1;
+                pointer-events: none;
+            }
+
+            .flash-bg::after {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background:
+                    linear-gradient(180deg, rgba(3, 7, 18, 0.24), rgba(3, 7, 18, 0.58)),
+                    radial-gradient(circle at top, color-mix(in srgb, var(--primary) 8%, transparent), transparent 36%);
+                z-index: -1;
+                pointer-events: none;
             }
 
             .effects-layer {
@@ -312,7 +327,7 @@
 
         @include('layouts.scripts')
     </head>
-    <body class="{{ $css['body'] ?? 'bg-neutral-50' }}">
+    <body class="{{ $css['body'] ?? 'bg-neutral-50' }} flash-bg">
         <div id="site-loader" class="site-loader" aria-live="polite" aria-label="Loading panel">
             <img src="{{ $siteConfiguration['flash']['logo'] }}" class="site-loader-logo" alt="Panel logo" />
             <div class="site-loader-ring"></div>

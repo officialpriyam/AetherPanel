@@ -32,11 +32,13 @@
                 $adminBackgroundImage = trim((string) ($siteConfiguration['flash']['backgroundImage'] ?? 'none'));
                 $adminBackgroundImageCss = $adminBackgroundImage === '' || $adminBackgroundImage === 'none'
                     ? 'none'
-                    : (str_starts_with($adminBackgroundImage, 'url(') ? $adminBackgroundImage : "url({$adminBackgroundImage})");
+                    : (str_starts_with($adminBackgroundImage, 'url(')
+                        ? $adminBackgroundImage
+                        : 'url(' . json_encode($adminBackgroundImage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . ')');
             @endphp
             <style>
                 body.admin-glass {
-                    --admin-primary: {{ $siteConfiguration['flash']['primary'] ?? '#6D28D9' }};
+                    --admin-primary: #2563eb;
                     --admin-gray-50: {{ $siteConfiguration['flash']['gray50'] ?? '#F8FAFC' }};
                     --admin-gray-100: {{ $siteConfiguration['flash']['gray100'] ?? '#F1F5F9' }};
                     --admin-gray-200: {{ $siteConfiguration['flash']['gray200'] ?? '#E2E8F0' }};
@@ -47,10 +49,12 @@
                     --admin-gray-700: {{ $siteConfiguration['flash']['gray700-default'] ?? ($siteConfiguration['flash']['gray700'] ?? '#0F172A') }};
                     --admin-gray-800: {{ $siteConfiguration['flash']['gray800'] ?? '#0B0F1A' }};
                     --admin-gray-900: {{ $siteConfiguration['flash']['gray900'] ?? '#020617' }};
-                    --admin-success: {{ $siteConfiguration['flash']['successBorder'] ?? '#56AA2B' }};
-                    --admin-danger: {{ $siteConfiguration['flash']['dangerBorder'] ?? '#AA2A2A' }};
+                    --admin-success: #16a34a;
+                    --admin-danger: #dc2626;
+                    --admin-warning: #d97706;
+                    --admin-info: #0891b2;
                     background:
-                        radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--admin-primary) 12%, transparent), transparent 30%),
+                        radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--admin-primary) 8%, transparent), transparent 30%),
                         radial-gradient(circle at 100% 10%, color-mix(in srgb, var(--admin-gray-200) 7%, transparent), transparent 28%),
                         linear-gradient(180deg, var(--admin-gray-900) 0%, color-mix(in srgb, var(--admin-gray-800) 85%, #030712) 35%, color-mix(in srgb, var(--admin-gray-700) 88%, #020617) 100%);
                     color: #dde6f3;
@@ -65,8 +69,8 @@
                     background-size: cover;
                     background-position: center;
                     background-repeat: no-repeat;
-                    opacity: 0.08;
-                    filter: blur(2px);
+                    opacity: 0.14;
+                    filter: blur(1px);
                     transform: scale(1.03);
                     pointer-events: none;
                 }
@@ -362,53 +366,56 @@
                     border-radius: 6px !important;
                     min-height: 40px;
                     padding: 9px 14px;
-                    border: 1px solid rgba(148, 163, 184, 0.12);
-                    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(15, 23, 42, 0.24));
+                    border: 1px solid rgba(148, 163, 184, 0.16);
+                    background: rgba(15, 23, 42, 0.78);
                     color: #e7eef8 !important;
-                    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.12);
+                    box-shadow: 0 8px 18px rgba(2, 6, 23, 0.1);
                     font-weight: 600;
                     line-height: 1.2;
-                    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+                    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
                 }
 
                 body.admin-glass .btn:hover,
                 body.admin-glass .btn:focus {
                     transform: translateY(-1px);
-                    border-color: rgba(148, 163, 184, 0.22);
-                    box-shadow: 0 10px 20px rgba(2, 6, 23, 0.14);
+                    border-color: rgba(148, 163, 184, 0.24);
+                    background: rgba(22, 32, 56, 0.9);
+                    box-shadow: 0 10px 20px rgba(2, 6, 23, 0.12);
                 }
 
                 body.admin-glass .btn-primary {
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 76%, white), color-mix(in srgb, var(--admin-primary) 68%, black)) !important;
-                    border-color: color-mix(in srgb, var(--admin-primary) 18%, white) !important;
+                    background: #2563eb !important;
+                    border-color: #2563eb !important;
                     color: #fff !important;
-                    box-shadow: 0 10px 20px color-mix(in srgb, var(--admin-primary) 12%, transparent);
+                    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
                 }
 
                 body.admin-glass .btn-success {
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-success) 74%, white), color-mix(in srgb, var(--admin-success) 66%, black)) !important;
-                    border-color: color-mix(in srgb, var(--admin-success) 22%, white) !important;
+                    background: #16a34a !important;
+                    border-color: #16a34a !important;
                     color: #fff !important;
-                    box-shadow: 0 10px 20px color-mix(in srgb, var(--admin-success) 10%, transparent);
+                    box-shadow: 0 10px 20px rgba(22, 163, 74, 0.16);
                 }
 
                 body.admin-glass .btn-warning {
-                    background: linear-gradient(180deg, #bd7b2b, #8d5316) !important;
-                    border-color: rgba(245, 158, 11, 0.24) !important;
+                    background: #d97706 !important;
+                    border-color: #d97706 !important;
                     color: #fff !important;
-                    box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
+                    box-shadow: 0 10px 20px rgba(217, 119, 6, 0.16);
                 }
 
                 body.admin-glass .btn-info {
-                    background: linear-gradient(180deg, #2376a7, #1a537f) !important;
-                    border-color: rgba(59, 130, 246, 0.22) !important;
+                    background: #0891b2 !important;
+                    border-color: #0891b2 !important;
                     color: #fff !important;
-                    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.1);
+                    box-shadow: 0 10px 20px rgba(8, 145, 178, 0.16);
                 }
 
                 body.admin-glass .btn-danger {
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-danger) 78%, white), color-mix(in srgb, var(--admin-danger) 70%, black)) !important;
-                    border-color: color-mix(in srgb, var(--admin-danger) 22%, white) !important;
+                    background: #dc2626 !important;
+                    border-color: #dc2626 !important;
+                    color: #fff !important;
+                    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.16);
                 }
 
                 body.admin-glass .btn-default,
@@ -442,9 +449,9 @@
                 body.admin-glass .btn-group .btn.active,
                 body.admin-glass .btn-group .btn:active,
                 body.admin-glass .btn-group .open > .dropdown-toggle.btn {
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 88%, white), color-mix(in srgb, var(--admin-primary) 78%, black)) !important;
-                    border-color: color-mix(in srgb, var(--admin-primary) 24%, white) !important;
-                    box-shadow: 0 12px 26px color-mix(in srgb, var(--admin-primary) 18%, transparent) !important;
+                    background: #1d4ed8 !important;
+                    border-color: #1d4ed8 !important;
+                    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.2) !important;
                 }
 
                 body.admin-glass .form-control,
@@ -796,7 +803,8 @@
 
                 body.admin-glass .swal-button {
                     border-radius: 4px;
-                    background: linear-gradient(180deg, color-mix(in srgb, var(--admin-primary) 76%, white), color-mix(in srgb, var(--admin-primary) 68%, black));
+                    background: #2563eb;
+                    border: 1px solid #2563eb;
                 }
 
                 body.admin-glass .breadcrumb {

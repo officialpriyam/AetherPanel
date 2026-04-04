@@ -86,11 +86,34 @@ const AuthContainer = () => {
     const loginGradient = useStoreState((state: ApplicationStore) => state.settings.data!.flash.loginGradient);
 
     const Gradient = () => (
-        String(loginGradient) == 'true' ? <div className={'absolute inset-0 z-[-1]'} css={'background-image:radial-gradient(circle, color-mix(in srgb, var(--gray800) 45%, transparent) 0%, var(--gray800) 100%);'} /> : null
-    )
+        String(loginGradient) == 'true'
+            ? <div
+                className={'absolute inset-0 z-[-1]'}
+                css={`
+                    background:
+                        radial-gradient(circle at top, rgba(20, 32, 52, 0.12), transparent 22%),
+                        linear-gradient(180deg, rgba(2, 6, 14, 0.3) 0%, rgba(3, 7, 16, 0.58) 42%, rgba(4, 8, 16, 0.9) 100%);
+                `}
+            />
+            : null
+    );
+
+    const backgroundStyle = loginLayout == 1
+        ? `
+            background-image:
+                linear-gradient(135deg, rgba(2, 6, 14, 0.94) 0%, rgba(4, 8, 16, 0.88) 44%, rgba(7, 12, 22, 0.96) 100%),
+                url(${loginBackground});
+            background-blend-mode: multiply;
+        `
+        : `
+            background:
+                radial-gradient(circle at top right, rgba(24, 39, 62, 0.16), transparent 24%),
+                radial-gradient(circle at bottom left, rgba(8, 23, 36, 0.22), transparent 32%),
+                linear-gradient(180deg, #040814 0%, #08111d 46%, #0a1220 100%);
+        `;
 
     return (
-        <div className={'min-h-screen h-full bg-center bg-no-repeat bg-cover z-10 relative'} css={`background-image:url(${loginLayout == 1 ? loginBackground : ''});`}>
+        <div className={'min-h-screen h-full bg-center bg-no-repeat bg-cover z-10 relative'} css={backgroundStyle}>
             <div className={'min-h-screen flex flex-col'}>
                 <TopBar />
                 <Switches />

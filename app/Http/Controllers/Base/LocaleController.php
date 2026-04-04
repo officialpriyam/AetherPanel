@@ -3,8 +3,8 @@
 namespace Pterodactyl\Http\Controllers\Base;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Translation\Translator;
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Translation\Translator;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Http\Requests\Base\LocaleRequest;
 
@@ -22,9 +22,15 @@ class LocaleController extends Controller
      */
     public function __invoke(LocaleRequest $request): JsonResponse
     {
-        $locale = $request->input('locale');
-        $namespace = $request->input('namespace');
-        $response[$locale][$namespace] = $this->i18n($this->loader->load($locale, $namespace));
+        $locales = $this->parseRequestedValues($request->input('locale'), true);
+        $namespaces = $this->parseRequestedValues($request->input('namespace'));
+        $response = [];
+
+        foreach ($locales as $locale) {
+            foreach ($namespaces as $namespace) {
+                $response[$locale][$namespace] = $this->i18n($this->loader->load($locale, $namespace));
+            }
+        }
 
         return new JsonResponse($response, 200, [
             // Cache this in the browser for an hour, and allow the browser to use a stale
@@ -60,5 +66,40 @@ class LocaleController extends Controller
         }
 
         return $data;
+    }
+
+    /**
+     * Normalize single and multiload query values into a clean list.
+     */
+    protected function parseRequestedValues(array|string|null $value, bool $isLocale = false): array
+    {
+        $values = is_array($value) ? $value : [$value];
+        $parsed = [];
+
+        foreach ($values as $entry) {
+            if (!is_string($entry)) {
+                continue;
+            }
+
+            foreach (preg_split('/[\s,+]+/', trim($entry)) ?: [] as $item) {
+                if ($item === '') {
+                    continue;
+                }
+
+                $parsed[] = $isLocale ? $this->normalizeLocale($item) : $item;
+            }
+        }
+
+        return array_values(array_unique(array_filter($parsed)));
+    }
+
+    /**
+     * The panel currently ships frontend translations under language-only directories.
+     */
+    protected function normalizeLocale(string $locale): string
+    {
+        $segments = preg_split('/[-_]/', strtolower(trim($locale))) ?: [];
+
+        return $segments[0] ?? 'en';
     }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import routes from '@/routers/routes';
 import { ApplicationStore } from '@/state';
@@ -118,6 +118,50 @@ const renderNavItem = (route: any) => (
   )
 );
 
+interface NavigationDropdownProps {
+  label: string;
+  children: React.ReactNode;
+}
+
+const NavigationDropdown = ({ label, children }: NavigationDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  return (
+    <div className="dropdown" data-open={isOpen} ref={containerRef}>
+      <button type="button" onClick={() => setIsOpen((open) => !open)} aria-expanded={isOpen}>
+        <span>{label}</span>
+        <ChevronDownIcon className="w-3" />
+      </button>
+      <div className="dropdown-body" onClick={() => setIsOpen(false)}>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export const SubNavigationLinks = () => {
   const { t } = useTranslation('flash/navigation');
   const flash = useStoreState((state: ApplicationStore) => state.settings.data!.flash as unknown as Record<string, unknown>);
@@ -135,35 +179,26 @@ export const SubNavigationLinks = () => {
         .map((route) =>
           renderNavItem(route)
         )}
-      <div className="dropdown group">
-        <span>{t('management')} <ChevronDownIcon className="w-3"/></span>
-        <div className="dropdown-body">
+      <NavigationDropdown label={t('management')}>
           {routes.server.management
             .filter((route) => !!route.name)
             .filter((route) => !isAddonRoute(route.name))
             .map((route) =>
               renderNavItem(route)
             )}
-        </div>
-      </div>
+      </NavigationDropdown>
       {addonRoutes.length > 0 && (
-        <div className="dropdown group">
-          <span>{t('addons')} ... <ChevronDownIcon className="w-3"/></span>
-          <div className="dropdown-body">
+        <NavigationDropdown label={`${t('addons')} ...`}>
             {addonRoutes.map((route) => renderNavItem(route))}
-          </div>
-        </div>
+        </NavigationDropdown>
       )}
-      <div className="dropdown group">
-        <span>{t('configuration')} <ChevronDownIcon className="w-3"/></span>
-        <div className="dropdown-body">
+      <NavigationDropdown label={t('configuration')}>
           {routes.server.configuration
             .filter((route) => !!route.name)
             .map((route) =>
               renderNavItem(route)
             )}
-        </div>
-      </div>
+      </NavigationDropdown>
     </>
   );
 };

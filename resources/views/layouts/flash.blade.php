@@ -45,7 +45,7 @@
                     <i class="fa-brands fa-discord"></i> Discord
                 </a>
                 <a href="{{ route('account') }}" class="account">
-                    <div class="user-image" style="background-color: var(--primary); color: white; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; font-weight: bold;">
+                    <div class="user-image" style="background: transparent; color: var(--gray200); border: none; box-shadow: none; display: flex; align-items: center; justify-content: center; width: auto; height: auto; font-weight: 600;">
                         {{ substr(Auth::user()->name_first, 0, 1) }}{{ substr(Auth::user()->name_last, 0, 1) }}
                     </div>
                     <span>{{ Auth::user()->name_first }} {{ Auth::user()->name_last }}</span>

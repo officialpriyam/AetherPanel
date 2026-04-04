@@ -18,11 +18,13 @@ i18n.use(I18NextMultiloadBackendAdapter)
             caches: ['localStorage'],
         },
         debug: process.env.DEBUG === 'true',
+        load: 'languageOnly',
+        cleanCode: true,
         fallbackLng: 'en',
         keySeparator: '.',
         backend: {
             backend: I18NextHttpBackend,
-            backendOptions: {
+            backendOption: {
                 loadPath: '/locales/locale.json?locale={{lng}}&namespace={{ns}}',
                 queryStringParams: { hash },
                 allowMultiLoading: true,

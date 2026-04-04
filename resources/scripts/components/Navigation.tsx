@@ -23,29 +23,44 @@ const NavigationLinks = styled.div`
     ${tw`mx-auto w-full lg:flex hidden items-center gap-x-6 max-w-[1200px] mt-2`};
 
     .dropdown {
-        ${tw`relative flex items-center gap-x-1 text-gray-200 duration-300 cursor-pointer`};
+        ${tw`relative flex items-center`};
 
-        & > span {
-            ${tw`relative flex items-center gap-x-1 text-gray-200 duration-300 cursor-pointer p-2`};
+        & > button {
+            ${tw`relative flex items-center gap-x-2 text-gray-200 duration-300 cursor-pointer p-2 rounded-xl border border-transparent bg-transparent`};
+            backdrop-filter: blur(0px);
 
             & > svg {
-                ${tw`duration-300`}
+                ${tw`duration-300 text-gray-300`}
+            }
+
+            &:hover,
+            &:focus {
+                ${tw`text-gray-100`};
+                background: rgba(255, 255, 255, 0.04);
+                border-color: rgba(148, 163, 184, 0.14);
             }
         }
 
         & > div {
-            ${tw`absolute top-[100%] left-0 flex-col gap-1 p-2 bg-gray-600 border-gray-500 z-[99] min-w-[150px] rounded opacity-0 pointer-events-none duration-300`};
+            ${tw`absolute top-[calc(100% + 10px)] left-0 flex-col gap-1 p-2 z-[99] min-w-[190px] rounded-2xl opacity-0 pointer-events-none duration-200`};
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            box-shadow: 0 24px 50px rgba(2, 6, 23, 0.45);
+            backdrop-filter: blur(18px);
+            transform: translateY(8px);
 
             & > a {
                 ${commonLinkStyles};
+                border-radius: 0.9rem;
 
                 &:hover,
                 &:focus {
-                    ${tw`bg-gray-500`};
+                    background: rgba(255, 255, 255, 0.07);
                 }
 
                 &.active {
-                    ${tw`text-gray-100 bg-gray-500`};
+                    ${tw`text-gray-100`};
+                    background: rgba(255, 255, 255, 0.1);
 
                     & > svg {
                         ${tw`text-gray-50`};
@@ -54,15 +69,23 @@ const NavigationLinks = styled.div`
             }
         }
 
-        &:hover {
-            ${tw`text-gray-100`}
+        &[data-open='true'] {
+            & > button {
+                ${tw`text-gray-100`};
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(148, 163, 184, 0.18);
+                box-shadow: 0 12px 25px rgba(15, 23, 42, 0.2);
+                backdrop-filter: blur(14px);
+            }
 
-            & > span > svg {
+            & > button > svg {
                 transform: rotate(180deg);
+                ${tw`text-gray-100`};
             }
 
             & > div {
-                ${tw`opacity-100 pointer-events-auto`}
+                ${tw`opacity-100 pointer-events-auto`};
+                transform: translateY(0);
             }
         }
     }

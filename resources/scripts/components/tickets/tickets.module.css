@@ -1,0 +1,238 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.hero {
+    border: 1px solid color-mix(in srgb, var(--gray500) 75%, transparent);
+    border-radius: var(--radiusBox);
+    padding: 1.1rem 1.2rem;
+    background:
+        linear-gradient(
+            140deg,
+            color-mix(in srgb, var(--gray700-default) 92%, transparent),
+            color-mix(in srgb, var(--gray800) 86%, transparent)
+        );
+    box-shadow: 0 20px 36px rgb(0 0 0 / 26%);
+    backdrop-filter: blur(12px);
+}
+
+.heroHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.heroTitle {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray100);
+}
+
+.heroSub {
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+    color: var(--gray300);
+    font-size: 0.88rem;
+}
+
+.toolbar {
+    border: 1px solid color-mix(in srgb, var(--gray500) 75%, transparent);
+    border-radius: var(--radiusBox);
+    padding: 0.95rem;
+    background: color-mix(in srgb, var(--gray700-default) 84%, transparent);
+    backdrop-filter: blur(12px);
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.ticketCard {
+    border: 1px solid color-mix(in srgb, var(--gray500) 75%, transparent);
+    background:
+        linear-gradient(
+            120deg,
+            color-mix(in srgb, var(--gray700-default) 90%, transparent),
+            color-mix(in srgb, var(--gray800) 82%, transparent)
+        );
+    border-radius: var(--radiusBox);
+    padding: 1rem;
+    transition: 180ms ease;
+}
+
+.ticketCard:hover {
+    border-color: color-mix(in srgb, var(--primary) 55%, var(--gray500));
+    transform: translateY(-1px);
+}
+
+.ticketRow {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ticketTitle {
+    font-size: 1.07rem;
+    font-weight: 700;
+    color: var(--gray100);
+    margin: 0;
+}
+
+.ticketMeta {
+    margin-top: 0.3rem;
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+}
+
+.metaText {
+    font-size: 0.76rem;
+    color: var(--gray300);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.73rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.infoCards {
+    margin-top: 0.4rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.infoCard {
+    border: 1px solid color-mix(in srgb, var(--gray500) 70%, transparent);
+    border-radius: var(--radiusBox);
+    background: color-mix(in srgb, var(--gray700-default) 80%, transparent);
+    padding: 1rem;
+}
+
+.infoCard p {
+    margin: 0;
+}
+
+.panelGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1rem;
+}
+
+.panel {
+    border: 1px solid color-mix(in srgb, var(--gray500) 74%, transparent);
+    border-radius: var(--radiusBox);
+    background:
+        linear-gradient(
+            130deg,
+            color-mix(in srgb, var(--gray700-default) 88%, transparent),
+            color-mix(in srgb, var(--gray800) 82%, transparent)
+        );
+}
+
+.panelBody {
+    padding: 1rem;
+}
+
+.messages {
+    max-height: 58vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.95rem;
+}
+
+.bubble {
+    max-width: 84%;
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--gray500) 85%, transparent);
+    background: color-mix(in srgb, var(--gray700-default) 70%, transparent);
+}
+
+.bubbleMine {
+    margin-left: auto;
+    border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.bubbleMeta {
+    font-size: 0.72rem;
+    color: var(--gray300);
+    margin-bottom: 0.25rem;
+}
+
+.detailList {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.detailItem {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--gray200);
+}
+
+.detailItem span:first-child {
+    color: var(--gray300);
+}
+
+.actionButton {
+    background: color-mix(in srgb, var(--gray700-default) 78%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gray500) 80%, transparent) !important;
+    color: var(--gray100) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    box-shadow: 0 10px 18px rgb(0 0 0 / 25%);
+}
+
+.actionButton:hover {
+    background: color-mix(in srgb, var(--gray700-default) 88%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gray400) 85%, transparent) !important;
+}
+
+.actionButtonSecondary {
+    background: color-mix(in srgb, var(--gray800) 60%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gray500) 70%, transparent) !important;
+    color: var(--gray200) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.actionButtonSecondary:hover {
+    border-color: color-mix(in srgb, var(--gray400) 85%, transparent) !important;
+    color: var(--gray100) !important;
+}
+
+@media (max-width: 1024px) {
+    .toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .infoCards {
+        grid-template-columns: 1fr;
+    }
+
+    .panelGrid {
+        grid-template-columns: 1fr;
+    }
+}

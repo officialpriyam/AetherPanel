@@ -1,0 +1,58 @@
+.shell {
+    background: color-mix(in srgb, var(--gray800) 70%, transparent);
+    border-color: color-mix(in srgb, var(--gray500) 70%, transparent);
+}
+
+.hero {
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--gray700-default) 90%, transparent),
+        color-mix(in srgb, var(--gray800) 82%, transparent)
+    );
+}
+
+.brand {
+    border-color: color-mix(in srgb, var(--gray400) 75%, transparent);
+    background: color-mix(in srgb, var(--gray700-default) 45%, transparent);
+    color: var(--gray100);
+    letter-spacing: 0.08em;
+}
+
+.card {
+    background-color: color-mix(in srgb, var(--gray800) 60%, transparent);
+    border-color: color-mix(in srgb, var(--gray500) 70%, transparent);
+    box-shadow: 0 18px 34px rgb(0 0 0 / 28%);
+}
+
+.card:hover {
+    border-color: color-mix(in srgb, var(--gray400) 80%, transparent);
+    transform: translateY(-3px);
+}
+
+.tag {
+    background-color: color-mix(in srgb, var(--gray700-default) 60%, transparent);
+    border-color: color-mix(in srgb, var(--gray500) 70%, transparent);
+}
+
+.tagSuccess {
+    border-color: color-mix(in srgb, #22c55e 55%, transparent);
+    background-color: color-mix(in srgb, #22c55e 18%, transparent);
+}
+
+.tagWarn {
+    border-color: color-mix(in srgb, #eab308 55%, transparent);
+    background-color: color-mix(in srgb, #eab308 18%, transparent);
+}
+
+.cardAction {
+    background: color-mix(in srgb, var(--gray700-default) 70%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gray500) 75%, transparent) !important;
+    color: var(--gray100) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.cardAction:hover {
+    background: color-mix(in srgb, var(--gray700-default) 85%, transparent) !important;
+    border-color: color-mix(in srgb, var(--gray400) 85%, transparent) !important;
+}

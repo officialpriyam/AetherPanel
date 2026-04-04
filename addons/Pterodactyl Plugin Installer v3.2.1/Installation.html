@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installation.md</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="plugin-installer-installation">Plugin Installer Installation</h1>
+<h2 id="automatic-installation">Automatic Installation</h2>
+<ol>
+<li>Drag the <code>release.zip</code> into your Pterodactyl directory (usually <code>/var/www/pterodactyl</code>)</li>
+<li>Run <code>npx fyrehostinstaller@latest</code></li>
+</ol>
+<hr>
+<ol>
+<li>
+<p>Drag and Drop all files from the <code>release.zip</code> into your Pterodactyl Panel’s root directory (usually <code>/var/www/pterodactyl</code>)</p>
+</li>
+<li>
+<p>In file <code>app/Transformers/Api/Client/ServerTransformer.php</code> add</p>
+<pre class=" language-php"><code class="prism  language-php"><span class="token string">'nest_id'</span> <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token variable">$server</span><span class="token operator">-</span><span class="token operator">&gt;</span><span class="token property">nest_id</span><span class="token punctuation">,</span>
+<span class="token string">'egg_id'</span> <span class="token operator">=</span><span class="token operator">&gt;</span> <span class="token variable">$server</span><span class="token operator">-</span><span class="token operator">&gt;</span><span class="token property">egg_id</span><span class="token punctuation">,</span>
+</code></pre>
+<p>To line 75</p>
+</li>
+<li>
+<p>In file <code>resources/scripts/routers/routes.ts</code> add</p>
+<pre class=" language-ts"><code class="prism  language-ts">nestId<span class="token operator">?</span><span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">;</span>
+eggId<span class="token operator">?</span><span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">;</span>
+nestIds<span class="token operator">?</span><span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+eggIds<span class="token operator">?</span><span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+</code></pre>
+<p>To line 37</p>
+</li>
+<li>
+<p>In file <code>resources/scripts/api/server/getServer.ts</code> add</p>
+<pre class=" language-ts"><code class="prism  language-ts">nestId<span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">;</span>
+eggId<span class="token punctuation">:</span> <span class="token keyword">number</span><span class="token punctuation">;</span>
+</code></pre>
+<p>To line 46</p>
+</li>
+<li>
+<p>In file <code>resources/scripts/api/server/getServer.ts</code> add</p>
+<pre class=" language-ts"><code class="prism  language-ts">nestId<span class="token punctuation">:</span> data<span class="token punctuation">.</span>nest_id<span class="token punctuation">,</span>
+eggId<span class="token punctuation">:</span> data<span class="token punctuation">.</span>egg_id<span class="token punctuation">,</span>
+</code></pre>
+<p>To line 75</p>
+</li>
+<li>
+<p>In file <code>resources/scripts/routers/ServerRouter.tsx</code> add</p>
+<pre><code>import { Navigation, ComponentLoader } from '@/routers/ServerElements';
+</code></pre>
+<p>To line 1 and replacing the following code<br>
+<img src="https://user-images.githubusercontent.com/15845442/176178297-936d0760-59d9-48ae-917d-2ebf35edb4b1.png" alt=""></p>
+<p>With</p>
+<pre class=" language-tsx"><code class="prism  language-tsx">&lt;Navigation /&gt;
+</code></pre>
+<p>And replacing the following code<br>
+<img src="https://user-images.githubusercontent.com/15845442/176178322-20f4123d-fdb5-4848-838c-7d390b4934db.png" alt=""></p>
+<p>With</p>
+<pre class=" language-tsx"><code class="prism  language-tsx">&lt;ComponentLoader /&gt;
+</code></pre>
+</li>
+<li>
+<p>In file <code>resources/scripts/routers/routes.ts</code> add</p>
+<pre class=" language-tsx"><code class="prism  language-tsx">import PluginManagerContainer from '@/components/server/plugin/PluginManagerContainer';
+</code></pre>
+<p>To line 16 and add</p>
+<pre class=" language-ts"><code class="prism  language-ts"><span class="token punctuation">{</span>
+   path<span class="token punctuation">:</span> <span class="token string">'/plugins'</span><span class="token punctuation">,</span>
+   permission<span class="token punctuation">:</span> <span class="token string">'file.*'</span><span class="token punctuation">,</span>
+   nestId<span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+   name<span class="token punctuation">:</span> <span class="token string">'Plugin Manager'</span><span class="token punctuation">,</span>
+   component<span class="token punctuation">:</span> PluginManagerContainer<span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">,</span>
+</code></pre>
+<p>To line 88</p>
+</li>
+<li>
+<p>Build the panel by running</p>
+<pre class=" language-bash"><code class="prism  language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh <span class="token operator">|</span> <span class="token function">bash</span>
+<span class="token function">bash</span>
+nvm <span class="token function">install</span> 16
+<span class="token function">npm</span> <span class="token function">install</span> -g yarn
+yarn
+yarn add sanitize-html@2.7.3 @types/sanitize-html@2.6.2
+yarn build:production
+</code></pre>
+</li>
+</ol>
+<h3 id="support">Support</h3>
+<p>Discord: <a href="https://discord.gg/zAMhP8YfQg">https://discord.gg/zAMhP8YfQg</a></p>
+<h3 id="terms-of-service">Terms of Service</h3>
+<pre><code>No refunds  
+No sharing of the plugin whatsoever
+</code></pre>
+</div>
+</body>
+
+</html>

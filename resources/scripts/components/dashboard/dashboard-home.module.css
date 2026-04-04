@@ -1,0 +1,415 @@
+.heroCard {
+    border-radius: var(--radiusBox, 12px);
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+    margin-bottom: 16px;
+}
+
+.heroContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.heroTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.heroSubTitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: rgba(226, 232, 240, 0.8);
+}
+
+.heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.heroButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(71, 85, 105, 0.4);
+    color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s ease, border 0.2s ease;
+}
+
+.heroButton:hover {
+    background: rgba(100, 116, 139, 0.5);
+}
+
+.heroGhostButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.4);
+    color: #e2e8f0;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s ease, border 0.2s ease;
+}
+
+.heroGhostButton:hover {
+    background: rgba(30, 41, 59, 0.6);
+}
+
+.toggleRow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggleLabel {
+    text-transform: uppercase;
+    font-size: 11px;
+    color: rgba(148, 163, 184, 0.9);
+}
+
+.alertWrap {
+    margin-bottom: 16px;
+}
+
+.dashboardGrid {
+    display: grid;
+    gap: 24px;
+}
+
+.mainColumn,
+.sideColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    border-radius: var(--radiusBox, 12px);
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
+    padding: 20px;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.cardTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.cardSub {
+    margin-top: 4px;
+    font-size: 13px;
+    color: rgba(148, 163, 184, 0.9);
+}
+
+.cardActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cardLink {
+    color: rgba(226, 232, 240, 0.9);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tab,
+.tabActive {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(71, 85, 105, 0.35);
+    color: rgba(226, 232, 240, 0.8);
+}
+
+.tabActive {
+    background: rgba(71, 85, 105, 0.6);
+    color: #e2e8f0;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.listRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    transition: border 0.2s ease, transform 0.2s ease;
+}
+
+.listRow:hover {
+    border-color: rgba(148, 163, 184, 0.35);
+    transform: translateY(-1px);
+}
+
+.listMain {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.listTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.listMeta {
+    font-size: 12px;
+    color: rgba(148, 163, 184, 0.9);
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.statusOnline {
+    background: rgba(16, 185, 129, 0.2);
+    color: #a7f3d0;
+}
+
+.statusOffline {
+    background: rgba(248, 113, 113, 0.2);
+    color: #fecaca;
+}
+
+.statusStarting {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fde68a;
+}
+
+.statusStopping {
+    background: rgba(248, 113, 113, 0.2);
+    color: #fecaca;
+}
+
+.statusSuspended {
+    background: rgba(148, 163, 184, 0.2);
+    color: #e2e8f0;
+}
+
+.statusUnknown {
+    background: rgba(148, 163, 184, 0.2);
+    color: #e2e8f0;
+}
+
+.empty {
+    padding: 12px;
+    color: rgba(148, 163, 184, 0.9);
+    font-size: 13px;
+}
+
+.ticketBadges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.ticketPill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.knowledgeCard {
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.knowledgeTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.knowledgeSub {
+    font-size: 13px;
+    color: rgba(226, 232, 240, 0.75);
+}
+
+.knowledgeButton {
+    align-self: flex-start;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: rgba(71, 85, 105, 0.35);
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.profileCard {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.profileAvatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(71, 85, 105, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profileName {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.profileRole {
+    font-size: 12px;
+    color: rgba(148, 163, 184, 0.9);
+    font-weight: 600;
+}
+
+.profileUser {
+    font-size: 12px;
+    color: rgba(148, 163, 184, 0.9);
+}
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activityRow {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.activityDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.9);
+    margin-top: 6px;
+}
+
+.activityTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.activityMeta {
+    font-size: 11px;
+    color: rgba(148, 163, 184, 0.85);
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    color: #f8fafc;
+    font-size: 13px;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+.toolbarControls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.serverGrid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .serverGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .heroContent {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dashboardGrid {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+}

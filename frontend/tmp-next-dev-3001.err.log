@@ -1,0 +1,108 @@
+ ⨯ ./src/admin/sections/OverviewPage.tsx
+Error: ENOENT: no such file or directory, open 'C:\Users\User\Desktop\panel-1.0-develop\frontend\src\admin\sections\OverviewPage.tsx'
+
+Import trace for requested module:
+./src/admin/sections/OverviewPage.tsx
+./src/admin/AdminApp.tsx
+./src/admin/AdminRouteEntry.tsx
+ ⨯ ./src/admin/AdminApp.tsx:23:40
+Module not found: Can't resolve './pages/ConfigEditorPage'
+  21 | import PanelLoading from '@/panel/PanelLoading';
+  22 |
+> 23 | const ConfigEditorPage = dynamic(() => import('./pages/ConfigEditorPage'), {
+     |                                        ^
+  24 |     loading: () => <PanelLoading ariaLabel={'Loading configuration editor'} embedded />,
+  25 | });
+  26 | const ResourcePage = dynamic(() => import('./pages/ResourcePage'), {
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/admin/AdminRouteEntry.tsx
+ ⨯ ./app/admin/admin.css
+Module not found: Can't resolve 'C:\Users\User\Desktop\panel-1.0-develop\frontend\app\admin\admin.css'
+
+https://nextjs.org/docs/messages/module-not-found
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|javascript/auto|C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\webpack\loaders\next-flight-css-loader.js??ruleSet[1].rules[14].oneOf[10].use[0]!C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\compiled\mini-css-extract-plugin\loader.js??ruleSet[1].rules[14].oneOf[10].use[1]!C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[14].oneOf[10].use[2]!C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[14].oneOf[10].use[3]!C:\Users\User\Desktop\panel-1.0-develop\frontend\app\admin\admin.css|app-pages-browser': No serializer registered for ModuleNotFoundError
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> webpack/lib/ModuleBuildError -> ModuleNotFoundError
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '1261542315'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2144242218'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2144242218'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '2144242218'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '1261542315'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '1261542315'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '1261542315'
+}
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function] {
+  digest: '2739431468'
+}
+ ⨯ Error: Could not find the module "C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\next-devtools\userspace\app\segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '1261542315'
+}
+[TypeError: __webpack_modules__[moduleId] is not a function]
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function]
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function] {
+  page: '/admin'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\6.pack.gz_' -> 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\6.pack.gz'
+ ⨯ ./src/admin/components/AdminChrome.tsx
+Error: ENOENT: no such file or directory, open 'C:\Users\User\Desktop\panel-1.0-develop\frontend\src\admin\components\AdminChrome.tsx'
+
+Import trace for requested module:
+./src/admin/components/AdminChrome.tsx
+./src/admin/AdminApp.tsx
+./src/admin/AdminRouteEntry.tsx
+ ⨯ ./src/admin/sections/OverviewPage.tsx
+Error: ENOENT: no such file or directory, open 'C:\Users\User\Desktop\panel-1.0-develop\frontend\src\admin\sections\OverviewPage.tsx'
+
+Import trace for requested module:
+./src/admin/sections/OverviewPage.tsx
+./src/admin/AdminApp.tsx
+./src/admin/AdminRouteEntry.tsx
+ ⨯ ./src/admin/AdminApp.tsx:29:36
+Module not found: Can't resolve './sections/OverviewPage'
+  27 |     loading: () => <PanelLoading ariaLabel={'Loading admin resource'} embedded />,
+  28 | });
+> 29 | const OverviewPage = dynamic(() => import('./sections/OverviewPage'), {
+     |                                    ^
+  30 |     loading: () => <PanelLoading ariaLabel={'Loading overview'} embedded />,
+  31 | });
+  32 | const EggManagementPage = dynamic(() => import('./sections/EggManagementPage'), {
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/admin/AdminRouteEntry.tsx
+ ⨯ ./app/admin/admin.css
+Module not found: Can't resolve 'C:\Users\User\Desktop\panel-1.0-develop\frontend\app\admin\admin.css'
+
+https://nextjs.org/docs/messages/module-not-found
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\2.pack.gz_' -> 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\2.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\3.pack.gz_' -> 'C:\Users\User\Desktop\panel-1.0-develop\frontend\.next\cache\webpack\client-development\3.pack.gz'
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...

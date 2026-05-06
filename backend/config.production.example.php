@@ -1,0 +1,43 @@
+<?php
+
+return [
+    'APP_NAME' => 'AetherPanel',
+    'APP_ENV' => 'production',
+    'APP_DEBUG' => false,
+    'APP_URL' => 'https://panel.example.com',
+    'PANEL_FRONTEND_URL' => 'https://panel.example.com',
+    'APP_KEY' => 'base64:generate-a-real-key-here',
+    'FRONTEND_API_KEY' => 'generate-a-frontend-access-key-here',
+    'MODULES_ENABLED' => true,
+    'MODULE_API_RATE_LIMIT' => 120,
+    'MODULE_API_KEYS' => [
+        // 'billing' => ['replace-with-a-module-api-key'],
+    ],
+    'TRUSTED_PROXIES' => '*',
+    'APP_CORS_ALLOWED_ORIGINS' => [
+        'https://panel.example.com',
+    ],
+    'APP_TIMEZONE' => 'UTC',
+    'SESSION_DRIVER' => 'redis',
+    'CACHE_DRIVER' => 'redis',
+    'QUEUE_CONNECTION' => 'redis',
+    'SESSION_SECURE_COOKIE' => true,
+    'SANCTUM_STATEFUL_DOMAINS' => [
+        'panel.example.com',
+    ],
+    'DB_HOST' => 'database',
+    'DB_PORT' => '3306',
+    'DB_DATABASE' => 'panel',
+    'DB_USERNAME' => 'aetherpanel',
+    'DB_PASSWORD' => 'replace-me',
+    'REDIS_HOST' => 'redis',
+    'REDIS_PORT' => '6379',
+    'MAIL_MAILER' => 'log',
+    'MAIL_FROM_ADDRESS' => 'noreply@panel.example.com',
+    'MAIL_FROM_NAME' => 'AetherPanel',
+    'RECAPTCHA_ENABLED' => false,
+    'RECAPTCHA_SECRET_KEY' => '',
+    'RECAPTCHA_WEBSITE_KEY' => '',
+    'MCVAPI_URL' => 'https://versions.mcjars.app',
+    'MCVAPI_KEY' => '',
+];

@@ -1,72 +1,96 @@
-[![Logo Image](https://cdn.pterodactyl.io/logos/new/pterodactyl_logo.png)](https://pterodactyl.io)
+# AetherPanel
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/pterodactyl/panel/ci.yaml?label=Tests&style=for-the-badge&branch=1.0-develop)
-![Discord](https://img.shields.io/discord/122900397965705216?label=Discord&logo=Discord&logoColor=white&style=for-the-badge)
-![GitHub Releases](https://img.shields.io/github/downloads/pterodactyl/panel/latest/total?style=for-the-badge)
-![GitHub contributors](https://img.shields.io/github/contributors/pterodactyl/panel?style=for-the-badge)
+AetherPanel is a standalone frontend and backend panel forked from Pterodactyl.
 
-# Pterodactyl Panel
+This repository is split into:
+- `backend/` - Laravel API, auth, admin, client, scheduler, and queue worker
+- `frontend/` - Next.js 16 frontend for panel, account, auth, and admin
+- `install.sh` - interactive Ubuntu production installer
 
-Pterodactyl® is a free, open-source game server management panel built with PHP, React, and Go. Designed with security
-in mind, Pterodactyl runs all game servers in isolated Docker containers while exposing a beautiful and intuitive
-UI to end users.
+## Stack
 
-Stop settling for less. Make game servers a first class citizen on your platform.
+- Backend: PHP 8.2/8.3, Laravel 11, MariaDB/MySQL, optional Redis
+- Frontend: Next.js 16.2.4, React 18, Yarn
+- Web: Nginx
+- Process management: systemd
 
-![Image](https://cdn.pterodactyl.io/site-assets/pterodactyl_v1_demo.gif)
+## Production install
 
-## Documentation
+`install.sh` is designed for a fresh Ubuntu 22.04 or 24.04 server.
 
-* [Panel Documentation](https://pterodactyl.io/panel/1.0/getting_started.html)
-* [Wings Documentation](https://pterodactyl.io/wings/1.0/installing.html)
-* [Community Guides](https://pterodactyl.io/community/about.html)
-* Or, get additional help [via Discord](https://discord.gg/pterodactyl)
+It will:
+- install PHP, Node 22, Composer, Nginx, MariaDB, Redis, and Certbot
+- ask for the panel domain, SSL choice, database credentials, and admin user data
+- deploy `backend/` and `frontend/` into the chosen install path
+- write `backend/config.php` and `frontend/.env.production`
+- run database migrations and seeders
+- create the first admin user
+- build the frontend
+- create systemd services for the frontend, queue worker, and scheduler timer
+- configure Nginx and optionally issue a Let's Encrypt certificate
 
-## Sponsors
+Run it as root:
 
-I would like to extend my sincere thanks to the following sponsors for helping fund Pterodactyl's development.
-[Interested in becoming a sponsor?](https://github.com/sponsors/pterodactyl)
+```bash
+chmod +x install.sh
+sudo ./install.sh
+```
 
-| Company                                                                           | About                                                                                                                                                                                                                                           |
-|-----------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [**Aussie Server Hosts**](https://aussieserverhosts.com/)                         | No frills Australian Owned and operated High Performance Server hosting for some of the most demanding games serving Australia and New Zealand.                                                                                                 |
-| [**BisectHosting**](https://www.bisecthosting.com/)                               | BisectHosting provides Minecraft, Valheim and other server hosting services with the highest reliability and lightning fast support since 2012.                                                                                                 |
-| [**MineStrator**](https://minestrator.com/)                                       | Looking for the most highend French hosting company for your minecraft server? More than 24,000 members on our discord trust us. Give us a try!                                                                                                 |
-| [**HostEZ**](https://hostez.io)                                                   | US & EU Rust & Minecraft Hosting. DDoS Protected bare metal, VPS and colocation with low latency, high uptime and maximum availability. EZ!                                                                                                     |
-| [**Blueprint**](https://blueprint.zip/?utm_source=pterodactyl&utm_medium=sponsor) | Create and install Pterodactyl addons and themes with the growing Blueprint framework - the package-manager for Pterodactyl. Use multiple modifications at once without worrying about conflicts and make use of the large extension ecosystem. |
-| [**indifferent broccoli**](https://indifferentbroccoli.com/)                      | indifferent broccoli is a game server hosting and rental company. With us, you get top-notch computer power for your gaming sessions. We destroy lag, latency, and complexity--letting you focus on the fun stuff.                              |
+## Production behavior
 
-### Supported Games
+The default production layout serves everything from one public domain:
+- Nginx proxies browser routes to the Next.js frontend
+- `/api`, `/sanctum`, and `/locales` are handled by the Laravel backend
 
-Pterodactyl supports a wide variety of games by utilizing Docker containers to isolate each instance. This gives
-you the power to run game servers without bloating machines with a host of additional dependencies.
+Important generated files:
+- backend runtime config: `backend/config.php`
+- frontend runtime/build config: `frontend/.env.production`
 
-Some of our core supported games include:
+Important services:
+- `aetherpanel-frontend.service`
+- `aetherpanel-queue.service`
+- `aetherpanel-scheduler.timer`
 
-* Minecraft — including Paper, Sponge, Bungeecord, Waterfall, and more
-* Rust
-* Terraria
-* Teamspeak
-* Mumble
-* Team Fortress 2
-* Counter Strike: Global Offensive
-* Garry's Mod
-* ARK: Survival Evolved
+## Backend performance
 
-In addition to our standard nest of supported games, our community is constantly pushing the limits of this software
-and there are plenty more games available provided by the community. Some of these games include:
+The production installer applies performance-oriented defaults:
+- Composer autoload optimization with authoritative classmaps
+- Laravel `config:cache`, `route:cache`, and `event:cache`
+- PHP-FPM pool tuning
+- OPcache and realpath cache tuning
+- gzip and keepalive settings in Nginx
 
-* Factorio
-* San Andreas: MP
-* Pocketmine MP
-* Squad
-* Xonotic
-* Starmade
-* Discord ATLBot, and most other Node.js/Python discord bots
-* [and many more...](https://pterodactyleggs.com)
+The backend code also preloads Flash theme settings by namespace instead of fetching them one key at a time. That cuts down the request cost for bootstrap and admin theme screens.
+
+## Local development
+
+Backend:
+
+```bash
+cd backend
+php artisan serve --host=localhost --port=8080
+```
+
+Frontend:
+
+```bash
+cd frontend
+yarn install
+yarn dev --port 3000
+```
+
+On Windows there is also:
+
+```powershell
+.\start.ps1
+```
+
+## Notes
+
+- This repo currently uses `backend/config.php` for runtime configuration instead of a normal Laravel `.env`-only production flow.
+- The frontend expects the backend frontend-access header key configured by `FRONTEND_API_KEY`.
+- `install.sh` is intended for fresh installs. Review it before running on an existing server.
 
 ## License
 
-Pterodactyl® Copyright © 2015 - 2022 Dane Everitt and contributors.
-
-Code released under the [MIT License](./LICENSE.md).
+This project is a fork of Pterodactyl. The upstream panel repository is MIT licensed, and this fork keeps an MIT license at the repository root with upstream attribution preserved.

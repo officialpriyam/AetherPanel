@@ -1,0 +1,42 @@
+{
+ "name": "AetherPanel",
+ "short_name": "AetherPanel",
+ "icons": [
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "0.75"
+  },
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "1.0"
+  },
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "1.5"
+  },
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "2.0"
+  },
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "3.0"
+  },
+  {
+   "src": "\/branding\/aether-mark.png",
+   "sizes": "512x512",
+   "type": "image\/png",
+   "density": "4.0"
+  }
+ ]
+}

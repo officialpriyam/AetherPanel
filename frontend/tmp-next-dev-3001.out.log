@@ -1,0 +1,86 @@
+yarn run v1.22.22
+$ next dev --port 3001
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.106:3001
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+   Disabled SWC as replacement for Babel because of custom Babel configuration "babel.config.js" https://nextjs.org/docs/messages/swc-disabled
+   `compiler` options in `next.config.js` will be ignored while using Babel https://nextjs.org/docs/messages/ignored-compiler-options
+ ✓ Ready in 3.5s
+   Using external babel configuration from C:\Users\User\Desktop\panel-1.0-develop\frontend\babel.config.js
+ ○ Compiling /[[...slug]] ...
+ ✓ Compiled /[[...slug]] in 154.9s (3373 modules)
+ ○ Compiling /admin/[[...slug]] ...
+ ✓ Compiled /admin/[[...slug]] in 14.5s (3225 modules)
+ GET / 200 in 15246ms
+ GET /account 200 in 16803ms
+ GET /admin 200 in 16983ms
+ GET /dashboard/servers 200 in 16995ms
+ ✓ Compiled in 11.9s (2891 modules)
+ ✓ Compiled in 1789ms (2891 modules)
+ ✓ Compiled in 1853ms (2877 modules)
+ ✓ Compiled in 2.7s (2877 modules)
+ ✓ Compiled in 1467ms (2877 modules)
+ ✓ Compiled in 2.7s (2877 modules)
+ ✓ Compiled in 1773ms (2877 modules)
+ ✓ Compiled in 1703ms (2877 modules)
+ ✓ Compiled in 266ms
+ ✓ Compiled in 19.3s (2904 modules)
+ ✓ Compiled in 1483ms (2891 modules)
+ ✓ Compiled in 3.8s (2877 modules)
+ ✓ Compiled /admin/[[...slug]] in 445ms (324 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 7.8s (3566 modules)
+ GET /admin 500 in 13151ms
+ ✓ Compiled in 94s (3033 modules)
+ ✓ Compiled in 7.3s (3060 modules)
+ ✓ Compiled in 85.4s (3047 modules)
+ ✓ Compiled in 530s (3169 modules)
+ ✓ Compiled in 48.9s (3142 modules)
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.106:3001
+   - Environments: .env
+
+ ✓ Starting...
+   Disabled SWC as replacement for Babel because of custom Babel configuration "babel.config.js" https://nextjs.org/docs/messages/swc-disabled
+   `compiler` options in `next.config.js` will be ignored while using Babel https://nextjs.org/docs/messages/ignored-compiler-options
+ ✓ Ready in 4.5s
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.106:3001
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+   Disabled SWC as replacement for Babel because of custom Babel configuration "babel.config.js" https://nextjs.org/docs/messages/swc-disabled
+   `compiler` options in `next.config.js` will be ignored while using Babel https://nextjs.org/docs/messages/ignored-compiler-options
+
+   We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+   The following mandatory changes were made to your tsconfig.json:
+
+   	- jsx was set to preserve (next.js implements its own optimized jsx transform)
+
+ ✓ Ready in 3.7s
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.106:3001
+   - Environments: .env
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+ ✓ Starting...
+   Disabled SWC as replacement for Babel because of custom Babel configuration "babel.config.js" https://nextjs.org/docs/messages/swc-disabled
+   `compiler` options in `next.config.js` will be ignored while using Babel https://nextjs.org/docs/messages/ignored-compiler-options
+
+   We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+   The following mandatory changes were made to your tsconfig.json:
+
+   	- jsx was set to preserve (next.js implements its own optimized jsx transform)
+
+ ✓ Ready in 4.4s

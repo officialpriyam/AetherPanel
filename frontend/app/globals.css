@@ -1,0 +1,76 @@
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background:
+        radial-gradient(circle at top, color-mix(in srgb, var(--surfaceOverlay) 42%, transparent), transparent 30%),
+        linear-gradient(180deg, var(--surfaceBase) 0%, color-mix(in srgb, var(--surfaceElevated) 84%, var(--surfaceBase)) 46%, var(--gray900) 100%);
+    color: var(--textPrimary);
+}
+
+:root {
+    --fontFamily: 'IBM Plex Sans';
+    --primary: #2563eb;
+    --primary-50: color-mix(in srgb, var(--primary) 10%, #ffffff);
+    --primary-100: color-mix(in srgb, var(--primary) 18%, #ffffff);
+    --primary-200: color-mix(in srgb, var(--primary) 26%, #ffffff);
+    --primary-300: color-mix(in srgb, var(--primary) 36%, #ffffff);
+    --primary-400: color-mix(in srgb, var(--primary) 52%, #ffffff);
+    --primary-500: var(--primary);
+    --primary-600: color-mix(in srgb, var(--primary) 82%, #000000);
+    --primary-700: color-mix(in srgb, var(--primary) 68%, #000000);
+    --primary-800: color-mix(in srgb, var(--primary) 56%, #000000);
+    --primary-900: color-mix(in srgb, var(--primary) 42%, #000000);
+    --primary-950: color-mix(in srgb, var(--primary) 28%, #000000);
+    --successText: #e1ffd8;
+    --successBorder: #56aa2b;
+    --successBackground: #3d8f1f;
+    --dangerText: #ffd8d8;
+    --dangerBorder: #aa2a2a;
+    --dangerBackground: #8f1f20;
+    --warningText: #ffe8be;
+    --warningBorder: #d6a250;
+    --warningBackground: #5b4118;
+    --infoText: #d8f6ff;
+    --infoBorder: #4dbbdb;
+    --infoBackground: #133e54;
+    --secondaryText: #e2e8f0;
+    --secondaryBorder: #475569;
+    --secondaryBackground: #1e293b;
+    --textPrimary: #f8fafc;
+    --textMuted: #94a3b8;
+    --surfaceBase: #08111a;
+    --surfaceElevated: #0c1723;
+    --surfaceCard: #122031;
+    --surfaceOverlay: #0a1520;
+    --borderColor: #22384c;
+    --borderStrong: #33536f;
+    --gray50: #f8fafc;
+    --gray100: #e2e8f0;
+    --gray200: #cbd5e1;
+    --gray300: #94a3b8;
+    --gray400: #64748b;
+    --gray500: #475569;
+    --gray600: #33485c;
+    --gray700: #223244;
+    --gray800: #101b28;
+    --gray900: #07111a;
+    --gray700-default: #1e293b;
+    --radiusBox: 8px;
+    --radiusInput: 7px;
+    --borderInput: 1px solid;
+    --image: none;
+    --image-blur: 0px;
+}
+
+body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: inherit;
+}

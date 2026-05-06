@@ -1,0 +1,22 @@
+yarn run v1.22.22
+$ node scripts/run-next.cjs dev --port 3003
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3003
+- Network:       http://192.168.1.106:3003
+- Environments: .env
+✓ Ready in 807ms
+Creating turbopack project {
+  dir: 'C:\\Users\\User\\Desktop\\panel-1.0-develop\\frontend',
+  testMode: true
+}
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Using external babel configuration from C:\Users\User\Desktop\panel-1.0-develop\frontend\babel.config.js
+○ Compiling /admin/[[...slug]] ...
+ GET /admin 200 in 20.0s
+ GET /account 200 in 226ms (next.js: 26ms, application-code: 200ms)
+ GET /admin 200 in 231ms (next.js: 112ms, application-code: 119ms)
+○ Compiling /[[...slug]] ...
+[?25h
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

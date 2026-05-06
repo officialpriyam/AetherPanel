@@ -72,39 +72,110 @@ const ServerError = ({ title, ...props }: ServerErrorProps) => (
     <ScreenBlock title={title || 'Something went wrong'} image={ServerErrorSvg} {...props} />
 );
 
-const NotFound = ({ title, message, onBack }: Partial<Pick<ScreenBlockProps, 'title' | 'message' | 'onBack'>>) => (
-    <PageContentBlock>
-        <div css={tw`flex justify-center`}>
-            <div
-                css={tw`w-full sm:w-4/5 md:w-3/4 lg:w-2/3 p-8 md:p-10 rounded-box border border-gray-500/60 backdrop-blur-md relative overflow-hidden shadow-2xl text-center`}
-                style={{
-                    boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.35)',
-                    background:
-                        'radial-gradient(circle at 14% -10%, color-mix(in srgb, var(--primary) 32%, transparent), transparent 46%), linear-gradient(140deg, color-mix(in srgb, var(--gray700-default) 85%, transparent), color-mix(in srgb, var(--gray800) 78%, transparent))',
-                }}
-            >
-                <div css={tw`mx-auto w-32 h-32 md:w-40 md:h-40 mb-4`}>
-                    <img src={NotFoundSvg} css={tw`w-full h-full select-none`} />
-                </div>
-                <h2 css={tw`text-5xl md:text-6xl font-bold text-gray-50`}>{title || '404'}</h2>
-                <p css={tw`text-sm md:text-base text-gray-200 mt-3 max-w-lg mx-auto`}>
-                    {message || 'The page you requested does not exist or may have been moved.'}
-                </p>
-                <div css={tw`mt-6 flex items-center justify-center gap-3`}>
-                    <Button
-                        type={'button'}
-                        onClick={() => (onBack ? onBack() : window.history.length > 1 ? window.history.back() : (window.location.href = '/'))}
-                    >
-                        Go Back
-                    </Button>
-                    <Button type={'button'} isSecondary onClick={() => (window.location.href = '/')}>
-                        Dashboard
-                    </Button>
-                </div>
+const NotFound = ({ title, message, onBack }: Partial<Pick<ScreenBlockProps, 'title' | 'message' | 'onBack'>>) => {
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    return (
+        <PageContentBlock>
+            <div css={tw`flex justify-center`}>
+                <section
+                    css={tw`w-full max-w-5xl overflow-hidden rounded-box border border-gray-500/60 backdrop-blur-md shadow-2xl`}
+                    style={{
+                        boxShadow: '0 30px 80px -32px rgb(0 0 0 / 0.55)',
+                        background:
+                            'radial-gradient(circle at top left, color-mix(in srgb, var(--primary) 26%, transparent), transparent 32%), linear-gradient(145deg, color-mix(in srgb, var(--surfaceCard) 92%, transparent), color-mix(in srgb, var(--surfaceOverlay) 88%, var(--surfaceBase)))',
+                    }}
+                >
+                    <div css={tw`grid gap-0 lg:grid-cols-[1.2fr,0.8fr]`}>
+                        <div css={tw`px-8 py-10 md:px-12 md:py-12`}>
+                            <div
+                                css={tw`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
+                                style={{
+                                    borderColor: 'color-mix(in srgb, var(--primary) 36%, transparent)',
+                                    background: 'color-mix(in srgb, var(--primary) 14%, transparent)',
+                                    color: 'var(--gray100)',
+                                }}
+                            >
+                                Error 404
+                            </div>
+
+                            <h2 css={tw`mt-5 text-4xl font-bold text-gray-50 md:text-6xl`}>
+                                {title || 'Route not found'}
+                            </h2>
+
+                            <p css={tw`mt-4 max-w-2xl text-sm leading-6 text-gray-200 md:text-base`}>
+                                {message || 'The page you requested is not available here anymore, or the link was never valid for this panel route.'}
+                            </p>
+
+                            {currentPath && (
+                                <div
+                                    css={tw`mt-5 inline-flex max-w-full items-center rounded-full border px-3 py-1 text-xs text-gray-200`}
+                                    style={{
+                                        borderColor: 'color-mix(in srgb, var(--borderStrong) 88%, transparent)',
+                                        background: 'color-mix(in srgb, var(--surfaceOverlay) 80%, transparent)',
+                                    }}
+                                >
+                                    <span css={tw`mr-2 text-gray-400`}>Requested path</span>
+                                    <span css={tw`truncate font-medium text-gray-100`}>{currentPath}</span>
+                                </div>
+                            )}
+
+                            <div css={tw`mt-8 flex flex-wrap items-center gap-3`}>
+                                <Button
+                                    type={'button'}
+                                    onClick={() => (onBack ? onBack() : window.history.length > 1 ? window.history.back() : (window.location.href = '/'))}
+                                >
+                                    Go Back
+                                </Button>
+                                <Button type={'button'} isSecondary onClick={() => (window.location.href = '/')}>
+                                    Dashboard
+                                </Button>
+                                <Button type={'button'} isSecondary onClick={() => (window.location.href = '/auth/login')}>
+                                    Sign In
+                                </Button>
+                            </div>
+
+                            <div css={tw`mt-8 grid gap-3 text-left text-sm text-gray-200 md:grid-cols-3`}>
+                                <div>
+                                    <div css={tw`font-semibold text-gray-50`}>Check the address</div>
+                                    <div css={tw`mt-1 text-gray-400`}>A copied link or stale bookmark can land on an invalid route.</div>
+                                </div>
+                                <div>
+                                    <div css={tw`font-semibold text-gray-50`}>Return to a known screen</div>
+                                    <div css={tw`mt-1 text-gray-400`}>Use the dashboard entrypoint to continue from a valid panel location.</div>
+                                </div>
+                                <div>
+                                    <div css={tw`font-semibold text-gray-50`}>Re-enter through login</div>
+                                    <div css={tw`mt-1 text-gray-400`}>If the link came from an expired session, sign in again and retry from navigation.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            css={tw`flex items-center justify-center border-t border-gray-500/30 px-6 py-8 lg:border-l lg:border-t-0`}
+                            style={{
+                                background:
+                                    'linear-gradient(180deg, color-mix(in srgb, var(--surfaceOverlay) 88%, transparent), color-mix(in srgb, var(--gray900) 92%, transparent))',
+                            }}
+                        >
+                            <div css={tw`w-full max-w-sm`}>
+                                <div
+                                    css={tw`rounded-box border border-gray-500/40 p-5`}
+                                    style={{
+                                        background:
+                                            'radial-gradient(circle at top, color-mix(in srgb, var(--primary) 18%, transparent), transparent 42%), color-mix(in srgb, var(--surfaceCard) 84%, transparent)',
+                                    }}
+                                >
+                                    <img src={NotFoundSvg} css={tw`mx-auto h-auto w-full max-w-xs select-none`} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
-    </PageContentBlock>
-);
+        </PageContentBlock>
+    );
+};
 
 export { ServerError, NotFound };
 export default ScreenBlock;

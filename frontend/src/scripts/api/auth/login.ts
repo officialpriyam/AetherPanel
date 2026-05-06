@@ -1,5 +1,6 @@
 import http from '@/api/http';
 import { ensureCsrfCookie } from '@/api/csrf';
+import { getApiBaseUrl } from '@/lib/runtimeUrls';
 
 export interface LoginResponse {
     complete: boolean;
@@ -15,7 +16,7 @@ export interface LoginData {
 
 export default ({ username, password, recaptchaData }: LoginData): Promise<LoginResponse> => {
     return new Promise((resolve, reject) => {
-        ensureCsrfCookie((process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, ''))
+        ensureCsrfCookie(getApiBaseUrl())
             .then(() =>
                 http.post('/api/auth/login', {
                     user: username,

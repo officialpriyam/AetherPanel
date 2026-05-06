@@ -1,10 +1,11 @@
 import http from '@/api/http';
 import { ensureCsrfCookie } from '@/api/csrf';
 import { LoginResponse } from '@/api/auth/login';
+import { getApiBaseUrl } from '@/lib/runtimeUrls';
 
 export default (token: string, code: string, recoveryToken?: string): Promise<LoginResponse> => {
     return new Promise((resolve, reject) => {
-        ensureCsrfCookie((process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, ''))
+        ensureCsrfCookie(getApiBaseUrl())
             .then(() =>
                 http.post('/api/auth/login/checkpoint', {
                     confirmation_token: token,

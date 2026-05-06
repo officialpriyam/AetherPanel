@@ -62,6 +62,11 @@ class RequireFrontendAccessKey
     private function hasTrustedOrigin(Request $request): bool
     {
         $allowedOrigins = $this->allowedOrigins();
+        $currentOrigin = $this->currentRequestOrigin($request);
+        if ($currentOrigin !== null && !in_array($currentOrigin, $allowedOrigins, true)) {
+            $allowedOrigins[] = $currentOrigin;
+        }
+
         if (count($allowedOrigins) === 0) {
             return false;
         }
@@ -77,6 +82,11 @@ class RequireFrontendAccessKey
         }
 
         return false;
+    }
+
+    private function currentRequestOrigin(Request $request): ?string
+    {
+        return $this->normalizeOrigin($request->getSchemeAndHttpHost());
     }
 
     /**

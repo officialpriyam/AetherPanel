@@ -4,10 +4,10 @@ import I18NextHttpBackend, { HttpBackendOptions } from 'i18next-http-backend';
 import I18NextMultiloadBackendAdapter from 'i18next-multiload-backend-adapter';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { getFrontendAccessHeaders } from '@/lib/backendAccess';
+import { buildRuntimeUrl } from '@/lib/runtimeUrls';
 
-const apiUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 const hash = process.env.NEXT_PUBLIC_BUILD_HASH || 'dev';
-const localeLoadPath = `${apiUrl || ''}/locales/locale.json?locale={{lng}}&namespace={{ns}}`;
+const localeLoadPath = buildRuntimeUrl('/locales/locale.json?locale={{lng}}&namespace={{ns}}');
 const fallbackNamespaces = [
     'activity',
     'admin/nests',
@@ -43,12 +43,12 @@ const fallbackNamespaces = [
 ];
 
 const getTranslationNamespaces = async (): Promise<string[]> => {
-    if (typeof window === 'undefined' || !apiUrl) {
+    if (typeof window === 'undefined') {
         return fallbackNamespaces;
     }
 
     try {
-        const response = await fetch(`${apiUrl}/locales/namespaces.json?locale=en`, {
+        const response = await fetch(buildRuntimeUrl('/locales/namespaces.json?locale=en'), {
             credentials: 'include',
             headers: {
                 Accept: 'application/json',

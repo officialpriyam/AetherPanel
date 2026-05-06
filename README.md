@@ -5,7 +5,7 @@ AetherPanel is a standalone frontend and backend panel forked from Pterodactyl.
 This repository is split into:
 - `backend/` - Laravel API, auth, admin, client, scheduler, and queue worker
 - `frontend/` - Next.js 16 frontend for panel, account, auth, and admin
-- `install.sh` - interactive Ubuntu production installer
+- `install.sh` - interactive Ubuntu/Debian production installer
 
 ## Stack
 
@@ -16,7 +16,7 @@ This repository is split into:
 
 ## Production install
 
-`install.sh` is designed for a fresh Ubuntu 22.04 or 24.04 server.
+`install.sh` is designed for a fresh Ubuntu 22.04/24.04 or Debian 12/13 server.
 
 It will:
 - install PHP, Node 22, Composer, Nginx, MariaDB, Redis, and Certbot
@@ -36,6 +36,12 @@ chmod +x install.sh
 sudo ./install.sh
 ```
 
+To remove an installed panel:
+
+```bash
+sudo ./install.sh uninstall
+```
+
 ## Production behavior
 
 The default production layout serves everything from one public domain:
@@ -47,6 +53,8 @@ Important generated files:
 - frontend runtime/build config: `frontend/.env.production`
 
 Important services:
+- `php8.3-fpm` for the Laravel backend runtime
+- `nginx`
 - `aetherpanel-frontend.service`
 - `aetherpanel-queue.service`
 - `aetherpanel-scheduler.timer`

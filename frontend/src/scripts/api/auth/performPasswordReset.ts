@@ -1,5 +1,6 @@
 import http from '@/api/http';
 import { ensureCsrfCookie } from '@/api/csrf';
+import { getApiBaseUrl } from '@/lib/runtimeUrls';
 
 interface Data {
     token: string;
@@ -14,7 +15,7 @@ interface PasswordResetResponse {
 
 export default (email: string, data: Data): Promise<PasswordResetResponse> => {
     return new Promise((resolve, reject) => {
-        ensureCsrfCookie((process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, ''))
+        ensureCsrfCookie(getApiBaseUrl())
             .then(() =>
                 http.post('/api/auth/password/reset', {
                     email,

@@ -1,9 +1,10 @@
 import axios, { AxiosInstance } from 'axios';
 import { attachCsrfProtection } from '@/api/csrf';
 import { getFrontendAccessHeaders } from '@/lib/backendAccess';
+import { getApiBaseUrl } from '@/lib/runtimeUrls';
 
 export const adminHttp: AxiosInstance = axios.create({
-    baseURL: (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, ''),
+    baseURL: getApiBaseUrl(),
     withCredentials: true,
     withXSRFToken: true,
     timeout: 20000,

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getFrontendAccessHeaders } from '@/lib/backendAccess';
+import { buildRuntimeUrl } from '@/lib/runtimeUrls';
 import PanelLoading from './PanelLoading';
 
 type BootstrapPayload = {
@@ -18,8 +19,6 @@ declare global {
     }
 }
 
-const apiUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
-
 export default function LegacyPanelClient() {
     const [AppComponent, setAppComponent] = useState<React.ComponentType | null>(null);
     const [state, setState] = useState<{ ready: boolean; error: string | null }>({
@@ -30,7 +29,12 @@ export default function LegacyPanelClient() {
     useEffect(() => {
         let active = true;
         const controller = new AbortController();
-        const bootstrapUrl = `${apiUrl}/api/bootstrap`;
+        let timedOut = false;
+        const bootstrapUrl = buildRuntimeUrl('/api/bootstrap');
+        const timeout = window.setTimeout(() => {
+            timedOut = true;
+            controller.abort();
+        }, 20000);
         const appModule = window.location.pathname.startsWith('/auth')
             ? import('@/components/AuthApp')
             : import('@/components/App');
@@ -57,6 +61,7 @@ export default function LegacyPanelClient() {
                     return;
                 }
 
+                window.clearTimeout(timeout);
                 setAppComponent(() => App);
                 window.PterodactylUser = payload.data.user ?? undefined;
                 window.SiteConfiguration = payload.data.siteConfiguration;
@@ -64,7 +69,17 @@ export default function LegacyPanelClient() {
                 window.dispatchEvent(new Event('panel:ready'));
             })
             .catch((error: Error) => {
-                if (!active || error.name === 'AbortError') {
+                if (!active) {
+                    return;
+                }
+
+                window.clearTimeout(timeout);
+                if (error.name === 'AbortError' && timedOut) {
+                    setState({ ready: false, error: `Bootstrap request timed out after 20 seconds. (${bootstrapUrl})` });
+                    return;
+                }
+
+                if (error.name === 'AbortError') {
                     return;
                 }
 
@@ -73,6 +88,7 @@ export default function LegacyPanelClient() {
 
         return () => {
             active = false;
+            window.clearTimeout(timeout);
             controller.abort();
         };
     }, []);

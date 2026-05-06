@@ -14,7 +14,7 @@ const defaultHeaders = {
     ...getFrontendAccessHeaders(),
 };
 
-const normalizeBaseUrl = (value: string): string => value.replace(/\/$/, '');
+const normalizeBaseUrl = (value: string): string => value.trim().replace(/\/$/, '');
 
 const readCookie = (name: string): string | null => {
     if (typeof document === 'undefined') {
@@ -50,8 +50,10 @@ const shouldEnsureCsrfCookie = (config: InternalAxiosRequestConfig, client: Axio
 
 export const ensureCsrfCookie = async (baseURL: string, forceRefresh = false): Promise<void> => {
     const normalizedBaseUrl = normalizeBaseUrl(baseURL);
+    const requestUrl = normalizedBaseUrl.length > 0 ? `${normalizedBaseUrl}/sanctum/csrf-cookie` : '/sanctum/csrf-cookie';
+    const requestKey = normalizedBaseUrl.length > 0 ? normalizedBaseUrl : '__same-origin__';
 
-    if (typeof window === 'undefined' || normalizedBaseUrl.length === 0) {
+    if (typeof window === 'undefined') {
         return;
     }
 
@@ -59,22 +61,22 @@ export const ensureCsrfCookie = async (baseURL: string, forceRefresh = false): P
         return;
     }
 
-    const existingRequest = pendingCsrfRequests.get(normalizedBaseUrl);
+    const existingRequest = pendingCsrfRequests.get(requestKey);
     if (existingRequest) {
         return existingRequest;
     }
 
-    const request = axios.get(`${normalizedBaseUrl}/sanctum/csrf-cookie`, {
+    const request = axios.get(requestUrl, {
         withCredentials: true,
         withXSRFToken: true,
         headers: defaultHeaders,
     }).then(() => undefined).finally(() => {
-        if (pendingCsrfRequests.get(normalizedBaseUrl) === request) {
-            pendingCsrfRequests.delete(normalizedBaseUrl);
+        if (pendingCsrfRequests.get(requestKey) === request) {
+            pendingCsrfRequests.delete(requestKey);
         }
     });
 
-    pendingCsrfRequests.set(normalizedBaseUrl, request);
+    pendingCsrfRequests.set(requestKey, request);
     return request;
 };
 

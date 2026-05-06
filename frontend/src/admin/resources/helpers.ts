@@ -2,6 +2,16 @@ import type { ResourceSection } from '../types';
 import { createPayloadForServer, DAEMON_BASE_PRESETS } from './definitions';
 import { formatScalar, inputToFieldValue } from '../utils';
 
+export const LEGACY_DAEMON_BASE_ALIASES: Record<string, string> = {
+    '/var/lib/ourpanel/volumes': DAEMON_BASE_PRESETS.linux,
+    '/var/lib/pterodactyl/volumes': DAEMON_BASE_PRESETS.linux,
+    'C:\\ourpanel\\volumes': DAEMON_BASE_PRESETS.windows,
+    'C:\\pterodactyl\\volumes': DAEMON_BASE_PRESETS.windows,
+};
+
+export const normalizeDaemonBasePathValue = (value: unknown): string =>
+    LEGACY_DAEMON_BASE_ALIASES[String(value || '')] || String(value || '');
+
 export function buildSummaryItems(section: ResourceSection, item: Record<string, any>): [string, string][] {
     const base: [string, string][] = [
         ['ID', String(item.id ?? '-')],
@@ -69,11 +79,12 @@ export function mapEntityToFormState(section: ResourceSection, item: Record<stri
     }
 
     if (section === 'nodes') {
-        const daemonBase = String(item.daemon_base || '');
+        const daemonBase = normalizeDaemonBasePathValue(item.daemon_base);
         const daemonBaseProfile = daemonBase.toLowerCase().startsWith('c:\\') ? 'windows' : 'linux';
 
         return {
             ...item,
+            daemon_base: daemonBase,
             daemon_base_profile: daemonBaseProfile,
         };
     }

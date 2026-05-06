@@ -13,6 +13,7 @@ import {
     buildSummaryItems,
     buildUpdatePayload,
     mapEntityToFormState,
+    normalizeDaemonBasePathValue,
 } from '../resources';
 import { DAEMON_BASE_PRESETS } from '../resources/definitions';
 import { Banner, DetailList, FieldEditor, Glyph, Panel, SubnavTabs } from '../components/common';
@@ -191,7 +192,7 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
 
             if (route.section === 'nodes' && fieldKey === 'daemon_base_profile') {
                 const selectedProfile = value === 'windows' ? 'windows' : 'linux';
-                const currentBase = (current.daemon_base || '').trim();
+                const currentBase = normalizeDaemonBasePathValue((current.daemon_base || '').trim());
                 const shouldSyncBasePath =
                     currentBase === '' || currentBase === nodeDaemonDefaults.linux || currentBase === nodeDaemonDefaults.windows;
 

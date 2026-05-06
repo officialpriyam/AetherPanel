@@ -7,6 +7,12 @@ interface QueryParams {
     type?: string;
 }
 
+export const getServersSwrKey = ({ page = 1, type }: QueryParams = {}): [string, number, string] => [
+    '/api/client/servers',
+    page,
+    type || 'default',
+];
+
 export default ({ query, ...params }: QueryParams): Promise<PaginatedResult<Server>> => {
     return new Promise((resolve, reject) => {
         http.get('/api/client', {

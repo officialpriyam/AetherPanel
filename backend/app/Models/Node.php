@@ -121,11 +121,21 @@ class Node extends Model
         'behind_proxy' => false,
         'memory_overallocate' => 0,
         'disk_overallocate' => 0,
-        'daemonBase' => '/var/lib/ourpanel/volumes',
+        'daemonBase' => '/var/lib/aetherpanel/volumes',
         'daemonSFTP' => 2022,
         'daemonListen' => 8080,
         'maintenance_mode' => false,
     ];
+
+    public static function normalizeDaemonBasePath(?string $path): string
+    {
+        return match ($path) {
+            '/var/lib/ourpanel/volumes', '/var/lib/pterodactyl/volumes' => '/var/lib/aetherpanel/volumes',
+            'C:\\ourpanel\\volumes', 'C:\\pterodactyl\\volumes' => 'C:\\aetherpanel\\volumes',
+            null, '' => '/var/lib/aetherpanel/volumes',
+            default => $path,
+        };
+    }
 
     /**
      * Get the connection address to use when making calls to this node.
@@ -158,7 +168,7 @@ class Node extends Model
                 'upload_limit' => $this->upload_size,
             ],
             'system' => [
-                'data' => $this->daemonBase,
+                'data' => self::normalizeDaemonBasePath($this->daemonBase),
                 'sftp' => [
                     'bind_port' => $this->daemonSFTP,
                 ],

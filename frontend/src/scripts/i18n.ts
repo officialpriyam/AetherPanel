@@ -87,7 +87,7 @@ void i18n
             order: ['localStorage'],
             caches: ['localStorage'],
         },
-        debug: process.env.NODE_ENV !== 'production',
+        debug: process.env.NEXT_PUBLIC_I18N_DEBUG === '1',
         load: 'languageOnly',
         cleanCode: true,
         fallbackLng: 'en',

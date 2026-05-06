@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useMemo } from 'react';
 import { Server } from '@/api/server/getServer';
 import { ApplicationStore } from '@/state';
-import getServers from '@/api/getServers';
+import getServers, { getServersSwrKey } from '@/api/getServers';
 import ServerCard from '@/components/dashboard/ServerCard';
 import ServerCardBanner from '@/components/dashboard/ServerCardBanner';
 import ServerCardGradient from '@/components/dashboard/ServerCardGradient';
@@ -18,7 +18,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useActivityLogs } from '@/api/account/activity';
 import { formatDistanceToNowStrict } from 'date-fns';
-import tickets from '@/api/tickets/tickets';
+import tickets, { EMPTY_TICKETS_RESPONSE } from '@/api/tickets/tickets';
 import { TicketsResponseData } from '@/api/tickets/types';
 import UserAvatar from '@/components/UserAvatar';
 import styles from './dashboard-home.module.css';
@@ -45,15 +45,24 @@ export default () => {
         useStoreState((state: ApplicationStore) => state.settings.data!.flash.addon_ticket_system_enabled)
     ) === 'true';
 
+    const serverType = showOnlyAdmin && rootAdmin ? 'admin' : undefined;
     const { data: servers, error } = useSWR(
-        ['/api/client/servers', showOnlyAdmin && rootAdmin],
-        () => getServers({ page: 1, type: showOnlyAdmin && rootAdmin ? 'admin' : undefined })
+        getServersSwrKey({ page: 1, type: serverType }),
+        () => getServers({ page: 1, type: serverType }),
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     );
 
     const { data: activityData } = useActivityLogs({ page: 1, sorts: { timestamp: -1 } });
     const { data: ticketData } = useSWR<TicketsResponseData>(
         ticketAddonEnabled ? ['dashboard', 'tickets'] : null,
-        () => tickets()
+        async () => {
+            try {
+                return await tickets({ timeout: 8000 });
+            } catch {
+                return EMPTY_TICKETS_RESPONSE;
+            }
+        },
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     );
 
     useEffect(() => {

@@ -2,17 +2,43 @@
 
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { LuArrowUpRight, LuPlus, LuShield } from 'react-icons/lu';
+import copy from 'copy-to-clipboard';
+import { LuArrowUpRight, LuCopy, LuPlus, LuShield } from 'react-icons/lu';
 import PanelLoading from '@/panel/PanelLoading';
 import { adminHttp, toHuman } from '../api';
 import type { AdminRoute } from '../types';
 import { Banner, DetailList, Glyph, Panel, SimpleTable } from '../components/common';
 import { formatScalar, getRelationItems } from '../utils';
+import { normalizeDaemonBasePathValue } from '../resources';
+
+const sanitizeConfiguration = (value: string): string =>
+    value
+        .replaceAll('C:\\ourpanel\\volumes', 'C:\\aetherpanel\\volumes')
+        .replaceAll('C:\\pterodactyl\\volumes', 'C:\\aetherpanel\\volumes')
+        .replaceAll('/var/lib/ourpanel/volumes', '/var/lib/aetherpanel/volumes')
+        .replaceAll('/var/lib/pterodactyl/volumes', '/var/lib/aetherpanel/volumes');
+
+const buildLinuxInstallCommand = (configuration: string): string => [
+    'sudo install -d -m 755 /etc/pterodactyl',
+    "sudo tee /etc/pterodactyl/config.yml > /dev/null <<'EOF'",
+    configuration,
+    'EOF',
+    'sudo systemctl restart wings',
+].join('\n');
+
+const buildWindowsInstallCommand = (configuration: string): string => [
+    "New-Item -ItemType Directory -Force 'C:\\ProgramData\\Pterodactyl' | Out-Null",
+    "@'",
+    configuration,
+    "'@ | Set-Content -Path 'C:\\ProgramData\\Pterodactyl\\config.yml' -Encoding UTF8",
+    'Restart-Service wings',
+].join('\n');
 
 export default function NodeDetailPanels({ item, refs, refresh, route }: { item: Record<string, any>; refs: Record<string, any>; refresh: () => Promise<void>; route: AdminRoute }) {
     const [configuration, setConfiguration] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState<string | null>(null);
+    const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
     const [allocationState, setAllocationState] = useState({ ip: '', alias: '', ports: '' });
 
     const allocations = getRelationItems(item, 'allocations');
@@ -42,7 +68,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                     return;
                 }
 
-                setConfiguration(typeof data === 'string' ? data : '');
+                setConfiguration(typeof data === 'string' ? sanitizeConfiguration(data) : '');
             })
             .catch((loadError) => {
                 if (active) {
@@ -55,6 +81,32 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
         };
     }, [item.id, route.tab]);
 
+    const location = getRelationItems(item, 'location')[0];
+    const locationLabel = location?.short || location?.long || location?.id || item.location_id;
+    const daemonBase = normalizeDaemonBasePathValue(item.daemon_base);
+    const prefersWindowsCommand = daemonBase.toLowerCase().startsWith('c:\\');
+    const installCommand = prefersWindowsCommand ? buildWindowsInstallCommand(configuration) : buildLinuxInstallCommand(configuration);
+    const installCommandLabel = prefersWindowsCommand ? 'PowerShell Install Command' : 'Linux Install Command';
+
+    useEffect(() => {
+        if (!copiedTarget) {
+            return;
+        }
+
+        const timeout = window.setTimeout(() => setCopiedTarget(null), 2500);
+
+        return () => window.clearTimeout(timeout);
+    }, [copiedTarget]);
+
+    const copyText = (target: 'yaml' | 'command', value: string) => {
+        if (!value) {
+            return;
+        }
+
+        copy(value);
+        setCopiedTarget(target);
+    };
+
     if (route.tab === 'settings') {
         return (
             <>
@@ -63,7 +115,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                     title="Node Settings"
                     items={[
                         ['Node ID', formatScalar(item.id)],
-                        ['Location', formatScalar(getRelationItems(item, 'location')[0]?.short ?? item.location_id)],
+                        ['Location', formatScalar(locationLabel)],
                         ['Location ID', formatScalar(item.location_id)],
                         ['FQDN', formatScalar(item.fqdn)],
                         ['Scheme', formatScalar(item.scheme)],
@@ -97,7 +149,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                                         upload_size: item.upload_size,
                                         daemon_listen: item.daemon_listen,
                                         daemon_sftp: item.daemon_sftp,
-                                        daemon_base: item.daemon_base,
+                                        daemon_base: daemonBase,
                                         reset_secret: true,
                                     });
                                     await refresh();
@@ -127,8 +179,47 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
         return (
             <>
                 {error ? <Banner tone="danger">{error}</Banner> : null}
-                <Panel title="Wings Configuration" copy="Copy this YAML into your node config file. It is generated from the current node settings and backend URL.">
-                    {configuration ? <pre className="admin-code-block">{configuration}</pre> : <PanelLoading ariaLabel={'Loading node configuration'} embedded />}
+                {copiedTarget === 'command' ? <Banner tone="warning">Install command copied.</Banner> : null}
+                {copiedTarget === 'yaml' ? <Banner tone="warning">YAML copied.</Banner> : null}
+                <div className="admin-code-stack">
+                    <Panel
+                        title={installCommandLabel}
+                        copy="Copy and run this on the node to write the current config.yml and restart Wings."
+                        actions={configuration ? (
+                            <button type="button" className="admin-button" onClick={() => copyText('command', installCommand)}>
+                                <Glyph icon={LuCopy} />
+                                {copiedTarget === 'command' ? 'Copied' : 'Copy Command'}
+                            </button>
+                        ) : null}
+                    >
+                        {configuration ? <pre className="admin-code-block">{installCommand}</pre> : <PanelLoading ariaLabel={'Loading node command'} embedded />}
+                    </Panel>
+                    <Panel
+                        title="Wings Configuration"
+                        copy="Copy this YAML into your node config file. It is generated from the current node settings and backend URL."
+                        actions={configuration ? (
+                            <button type="button" className="admin-button" onClick={() => copyText('yaml', configuration)}>
+                                <Glyph icon={LuCopy} />
+                                {copiedTarget === 'yaml' ? 'Copied' : 'Copy YAML'}
+                            </button>
+                        ) : null}
+                    >
+                        {configuration ? <pre className="admin-code-block">{configuration}</pre> : <PanelLoading ariaLabel={'Loading node configuration'} embedded />}
+                    </Panel>
+                </div>
+                <Panel title="Node Runtime" copy="The generated command follows the node's current filesystem profile and uses the normalized daemon base path.">
+                    <div className="admin-detail-grid">
+                        {[
+                            ['Daemon Base', formatScalar(daemonBase)],
+                            ['Command Mode', prefersWindowsCommand ? 'PowerShell' : 'Linux shell'],
+                            ['Config Path', prefersWindowsCommand ? 'C:\\ProgramData\\Pterodactyl\\config.yml' : '/etc/pterodactyl/config.yml'],
+                        ].map(([label, value]) => (
+                            <div key={label} className="admin-detail-grid__item">
+                                <span>{label}</span>
+                                <strong>{value}</strong>
+                            </div>
+                        ))}
+                    </div>
                 </Panel>
             </>
         );

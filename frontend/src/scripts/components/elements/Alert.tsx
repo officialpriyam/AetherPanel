@@ -69,6 +69,9 @@ const MyAlert = styled.div`
     }
 `;
 
+const ANNOUNCEMENT_DISMISS_TTL = 6 * 60 * 60 * 1000;
+const isEnabled = (value: unknown): boolean => value === true || ['1', 'true', 'yes', 'on'].includes(String(value).toLowerCase());
+
 const Alert = () => {
     const [isOpen, setIsOpen] = useState(true);
 
@@ -77,37 +80,51 @@ const Alert = () => {
     const announcementMessage = useStoreState((state: ApplicationStore) => state.settings.data!.flash.announcementMessage);
     const announcementTimeout = useStoreState((state: ApplicationStore) => state.settings.data!.flash.announcementTimeout);
     const announcementIcon = useStoreState((state: ApplicationStore) => state.settings.data!.flash.announcementIcon);
+    const announcementKey = `aetherpanel:announcement:${announcementType}:${announcementMessage.trim()}`;
 
     useEffect(() => {
-        let isClosedTime = false;
-        const closedTime = localStorage.getItem('closedTime');
-        if (closedTime) {
-            const timeElapsed = Date.now() - parseInt(closedTime, 10);
-            const sixHours = 6 * 60 * 60 * 1000;
-            if (timeElapsed < sixHours) {
-                setIsOpen(false);
-                isClosedTime = true;
-                const timeout = sixHours - timeElapsed;
-                setTimeout(() => {
-                    setIsOpen(true);
-                    localStorage.removeItem('closedTime');
-                }, timeout);
-            } else {
-                localStorage.removeItem('closedTime');
+        if (announcementType === 'disabled' || announcementMessage.trim().length < 1) {
+            setIsOpen(false);
+            return;
+        }
+
+        let reopenTimer: number | undefined;
+        let autoHideTimer: number | undefined;
+        const dismissedAt = Number(localStorage.getItem(announcementKey) || '0');
+        const timeElapsed = dismissedAt > 0 ? Date.now() - dismissedAt : ANNOUNCEMENT_DISMISS_TTL + 1;
+        const isDismissed = dismissedAt > 0 && timeElapsed < ANNOUNCEMENT_DISMISS_TTL;
+
+        if (isDismissed) {
+            setIsOpen(false);
+            reopenTimer = window.setTimeout(() => {
+                localStorage.removeItem(announcementKey);
+                setIsOpen(true);
+            }, ANNOUNCEMENT_DISMISS_TTL - timeElapsed);
+        } else {
+            localStorage.removeItem(announcementKey);
+            setIsOpen(true);
+
+            const timeoutSeconds = Number(announcementTimeout);
+            if (Number.isFinite(timeoutSeconds) && timeoutSeconds > 0) {
+                autoHideTimer = window.setTimeout(() => {
+                    setIsOpen(false);
+                }, timeoutSeconds * 1000);
             }
         }
 
-        if (isOpen && !isClosedTime && announcementTimeout && Number(announcementTimeout) > 0) {
-            const timer = setTimeout(() => {
-                setIsOpen(false);
-            }, Number(announcementTimeout) * 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [isOpen, announcementTimeout]);
+        return () => {
+            if (reopenTimer) {
+                window.clearTimeout(reopenTimer);
+            }
+            if (autoHideTimer) {
+                window.clearTimeout(autoHideTimer);
+            }
+        };
+    }, [announcementKey, announcementMessage, announcementTimeout, announcementType]);
 
     const handleClose = () => {
         setIsOpen(false);
-        localStorage.setItem('closedTime', Date.now().toString());
+        localStorage.setItem(announcementKey, Date.now().toString());
     };
 
     return (
@@ -136,7 +153,7 @@ const Alert = () => {
                     {parser.toReact(announcementMessage)}
                 </div>
 
-                {String(announcementCloseable) === 'true' &&
+                {isEnabled(announcementCloseable) &&
                 <button className={'ml-auto p-2 hover:bg-white/20 duration-300 rounded-lg'} onClick={handleClose}>
                     <LuCircleX />
                 </button>}

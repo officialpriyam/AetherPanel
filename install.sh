@@ -7,9 +7,7 @@ SERVICE_PREFIX="aetherpanel"
 DEFAULT_INSTALL_ROOT="/var/www/aetherpanel"
 DEFAULT_FRONTEND_PORT="3000"
 PHP_VERSION="${PHP_VERSION:-8.3}"
-SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_SOURCE="${SOURCE_ROOT}/backend"
-FRONTEND_SOURCE="${SOURCE_ROOT}/frontend"
+PANEL_REPO_URL="${PANEL_REPO_URL:-https://github.com/officialpriyam/AetherPanel.git}"
 
 INSTALL_ROOT=""
 BACKEND_DIR=""
@@ -82,11 +80,6 @@ require_root() {
     if [[ "${EUID}" -ne 0 ]]; then
         fail "Run this installer as root."
     fi
-}
-
-require_repo_layout() {
-    [[ -f "${BACKEND_SOURCE}/composer.json" ]] || fail "Cannot find backend/composer.json."
-    [[ -f "${FRONTEND_SOURCE}/package.json" ]] || fail "Cannot find frontend/package.json."
 }
 
 ensure_ubuntu() {
@@ -199,6 +192,15 @@ require_port() {
 require_mysql_grant_host() {
     local value="$1"
     [[ "${value}" =~ ^[A-Za-z0-9.%:_-]+$ ]] || fail "Grant database user access from host contains invalid characters."
+}
+
+normalize_git_remote() {
+    local value="$1"
+    value="${value%.git}"
+    value="${value#git@github.com:}"
+    value="${value#https://github.com/}"
+    value="${value#http://github.com/}"
+    printf '%s' "${value}"
 }
 
 run_as_app() {
@@ -373,23 +375,33 @@ prepare_install_tree() {
     PHP_PERF_INI_PATH="/etc/php/${PHP_VERSION}/fpm/conf.d/99-${SERVICE_PREFIX}-performance.ini"
     PHP_FPM_POOL_OVERRIDE_PATH="/etc/php/${PHP_VERSION}/fpm/pool.d/99-${SERVICE_PREFIX}-performance.conf"
 
-    mkdir -p "${INSTALL_ROOT}" "${BACKEND_DIR}" "${FRONTEND_DIR}"
+    mkdir -p "$(dirname "${INSTALL_ROOT}")"
 
-    log "Copying backend source to ${BACKEND_DIR}."
-    rsync -a \
-        --exclude '.git' \
-        --exclude 'vendor' \
-        --exclude 'node_modules' \
-        --exclude '.env' \
-        "${BACKEND_SOURCE}/" "${BACKEND_DIR}/"
+    if [[ -d "${INSTALL_ROOT}/.git" ]]; then
+        local current_remote=""
+        local repo_branch=""
 
-    log "Copying frontend source to ${FRONTEND_DIR}."
-    rsync -a \
-        --exclude '.git' \
-        --exclude 'node_modules' \
-        --exclude '.next' \
-        --exclude '.env' \
-        "${FRONTEND_SOURCE}/" "${FRONTEND_DIR}/"
+        current_remote="$(git -C "${INSTALL_ROOT}" remote get-url origin 2>/dev/null || true)"
+        [[ -n "${current_remote}" ]] || fail "Existing install directory contains a git repository without an origin remote."
+        [[ "$(normalize_git_remote "${current_remote}")" == "$(normalize_git_remote "${PANEL_REPO_URL}")" ]] || fail "Install directory already contains a different git repository: ${current_remote}"
+
+        log "Updating panel source from ${PANEL_REPO_URL}."
+        git -C "${INSTALL_ROOT}" fetch --all --prune
+        repo_branch="$(git -C "${INSTALL_ROOT}" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')"
+        repo_branch="${repo_branch:-$(git -C "${INSTALL_ROOT}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo main)}"
+        git -C "${INSTALL_ROOT}" checkout "${repo_branch}"
+        git -C "${INSTALL_ROOT}" reset --hard "origin/${repo_branch}" || git -C "${INSTALL_ROOT}" pull --ff-only
+    elif [[ -d "${INSTALL_ROOT}" ]] && [[ -n "$(find "${INSTALL_ROOT}" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]]; then
+        fail "Install directory is not empty. Clear ${INSTALL_ROOT} or choose another path."
+    else
+        log "Cloning panel source from ${PANEL_REPO_URL} into ${INSTALL_ROOT}."
+        git clone "${PANEL_REPO_URL}" "${INSTALL_ROOT}"
+    fi
+
+    git -C "${INSTALL_ROOT}" submodule update --init --recursive >/dev/null 2>&1 || true
+
+    [[ -f "${BACKEND_DIR}/composer.json" ]] || fail "Downloaded panel source is missing backend/composer.json."
+    [[ -f "${FRONTEND_DIR}/package.json" ]] || fail "Downloaded panel source is missing frontend/package.json."
 
     chown -R "${APP_USER}:${APP_GROUP}" "${INSTALL_ROOT}"
     find "${INSTALL_ROOT}" -type d -exec chmod 755 {} +
@@ -798,6 +810,7 @@ print_summary() {
     log "Installation completed."
     printf 'Panel URL: %s\n' "${PANEL_URL}"
     printf 'Install path: %s\n' "${INSTALL_ROOT}"
+    printf 'Source repository: %s\n' "${PANEL_REPO_URL}"
     printf 'Frontend service: %s-frontend.service\n' "${SERVICE_PREFIX}"
     printf 'Queue service: %s-queue.service\n' "${SERVICE_PREFIX}"
     printf 'Scheduler timer: %s-scheduler.timer\n' "${SERVICE_PREFIX}"
@@ -813,7 +826,6 @@ print_summary() {
 
 main() {
     require_root
-    require_repo_layout
     ensure_ubuntu
     collect_install_configuration
     install_system_packages

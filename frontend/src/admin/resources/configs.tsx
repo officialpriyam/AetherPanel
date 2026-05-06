@@ -98,8 +98,10 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
             { label: 'Name', render: (item) => item.name },
             { label: 'Location', render: (item) => {
                 const location = getRelationItems(item, 'location')[0];
-                if (location) {
-                    return `${location.short} (#${location.id})`;
+                const locationLabel = location?.short || location?.long || (location?.id ? `#${location.id}` : null);
+
+                if (locationLabel) {
+                    return location?.id && location?.short ? `${location.short} (#${location.id})` : locationLabel;
                 }
 
                 return item.location_id ? `#${item.location_id}` : '-';

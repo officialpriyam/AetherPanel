@@ -33,6 +33,8 @@ class SiteConfigurationService
                 'announcementType' => $this->settings->get('settings::flash:announcementType', 'party'),
                 'announcementCloseable' => $this->settings->get('settings::flash:announcementCloseable', false),
                 'announcementMessage' => $this->settings->get('settings::flash:announcementMessage', 'We have a brand new game panel design!'),
+                'announcementTimeout' => $this->settings->get('settings::flash:announcementTimeout', '0'),
+                'announcementIcon' => $this->settings->get('settings::flash:announcementIcon', ''),
                 'mail_color' => $this->settings->get('settings::flash:mail_color', '#1E293B'),
                 'mail_backgroundColor' => $this->settings->get('settings::flash:mail_backgroundColor', '#F5F5FF'),
                 'mail_logo' => $this->settings->get('settings::flash:mail_logo', $brandAssetUrl),

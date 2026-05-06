@@ -452,6 +452,11 @@ body::-webkit-scrollbar,
     gap: 18px;
 }
 
+.admin-code-stack {
+    display: grid;
+    gap: 18px;
+}
+
 .admin-hero,
 .admin-overview-head,
 .admin-overview-banner,

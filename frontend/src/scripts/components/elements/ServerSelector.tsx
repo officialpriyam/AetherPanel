@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Server } from '@/api/server/getServer';
-import getServers from '@/api/getServers';
-import { useStoreState } from 'easy-peasy';
+import getServers, { getServersSwrKey } from '@/api/getServers';
 import useSWR from 'swr';
 import { PaginatedResult } from '@/api/http';
 import { useLocation, useHistory } from 'react-router-dom';
@@ -14,11 +13,27 @@ export default () => {
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 
     const [ page, setPage ] = useState((!isNaN(defaultPage) && defaultPage > 0) ? defaultPage : 1);
-    const uuid = useStoreState(state => state.user.data!.uuid);
+    const emptyPage = {
+        items: [],
+        pagination: {
+            total: 0,
+            count: 0,
+            perPage: 50,
+            currentPage: page,
+            totalPages: 1,
+        },
+    } as PaginatedResult<Server>;
     
     const { data: servers } = useSWR<PaginatedResult<Server>>(
-        [ '/api/client/servers', page ],
-        () => getServers({ page }),
+        getServersSwrKey({ page }),
+        async () => {
+            try {
+                return await getServers({ page });
+            } catch {
+                return emptyPage;
+            }
+        },
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     );
 
     useEffect(() => {

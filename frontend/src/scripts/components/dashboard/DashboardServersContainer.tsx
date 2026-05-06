@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Server } from '@/api/server/getServer';
 import { ApplicationStore } from '@/state';
-import getServers from '@/api/getServers';
+import getServers, { getServersSwrKey } from '@/api/getServers';
 import ServerCard from '@/components/dashboard/ServerCard';
 import ServerCardBanner from '@/components/dashboard/ServerCardBanner';
 import ServerCardGradient from '@/components/dashboard/ServerCardGradient';
@@ -28,9 +28,11 @@ export default () => {
     const [query, setQuery] = useState('');
     const [runningOnly, setRunningOnly] = useState(false);
 
+    const serverType = showOnlyAdmin && rootAdmin ? 'admin' : undefined;
     const { data: servers, error } = useSWR<PaginatedResult<Server>>(
-        ['/api/client/servers', page, showOnlyAdmin && rootAdmin],
-        () => getServers({ page, type: showOnlyAdmin && rootAdmin ? 'admin' : undefined })
+        getServersSwrKey({ page, type: serverType }),
+        () => getServers({ page, type: serverType }),
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     );
 
     useEffect(() => {

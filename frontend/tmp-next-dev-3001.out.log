@@ -84,3 +84,4 @@ $ next dev --port 3001
    	- jsx was set to preserve (next.js implements its own optimized jsx transform)
 
  ✓ Ready in 4.4s
+ ○ Compiling /[[...slug]] ...

@@ -9,17 +9,46 @@ export const normalizeApiPayload = (input: any): any => {
     }
 
     if (input?.attributes && input?.object) {
-        return {
-            ...input.attributes,
+        const normalizedAttributes = normalizeApiPayload(input.attributes);
+        const normalizedRelationships = isPlainObject(input.relationships)
+            ? Object.fromEntries(
+                Object.entries(input.relationships).map(([key, value]) => [key, normalizeApiPayload(value)])
+            )
+            : undefined;
+
+        const normalized = {
+            ...normalizedAttributes,
             __object: input.object,
         };
+
+        if (normalizedRelationships && Object.keys(normalizedRelationships).length > 0) {
+            normalized.relationships = normalizedRelationships;
+
+            Object.entries(normalizedRelationships).forEach(([key, value]) => {
+                if (normalized[key] === undefined) {
+                    normalized[key] = value;
+                }
+            });
+        }
+
+        return normalized;
+    }
+
+    if (Array.isArray(input)) {
+        return input.map((entry) => normalizeApiPayload(entry));
+    }
+
+    if (isPlainObject(input)) {
+        return Object.fromEntries(
+            Object.entries(input).map(([key, value]) => [key, normalizeApiPayload(value)])
+        );
     }
 
     return input;
 };
 
 export const getRelationItems = (value: any, key: string): any[] => {
-    const relation = value?.relationships?.[key];
+    const relation = value?.relationships?.[key] ?? value?.[key];
     const normalized = normalizeApiPayload(relation);
 
     return Array.isArray(normalized) ? normalized : normalized ? [normalized] : [];

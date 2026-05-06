@@ -106,3 +106,27 @@ https://nextjs.org/docs/messages/module-not-found
  ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
  ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
  ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+ ⨯ Module not found: Error: Can't resolve 'next-flight-client-entry-loader' in 'C:\Users\User\Desktop\panel-1.0-develop\frontend'
+[Error: Cannot find module '@swc/helpers/package.json'
+Require stack:
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\create-compiler-aliases.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\webpack-config.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\start-server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+[Error: Cannot find module '@swc/helpers/package.json'
+Require stack:
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\create-compiler-aliases.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\build\webpack-config.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\User\Desktop\panel-1.0-develop\node_modules\next\dist\server\lib\start-server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Module not found: Error: Can't resolve 'next-flight-client-entry-loader' in 'C:\Users\User\Desktop\panel-1.0-develop\frontend'

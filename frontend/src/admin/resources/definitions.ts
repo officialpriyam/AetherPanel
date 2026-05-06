@@ -3,8 +3,8 @@ import { adminHttp } from '../api';
 import { getRelationItems } from '../utils';
 
 export const DAEMON_BASE_PRESETS = {
-    linux: '/var/lib/ourpanel/volumes',
-    windows: 'C:\\ourpanel\\volumes',
+    linux: '/var/lib/aetherpanel/volumes',
+    windows: 'C:\\aetherpanel\\volumes',
 } as const;
 
 const sortOptions = (options: FormFieldOption[]): FormFieldOption[] =>

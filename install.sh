@@ -8,6 +8,9 @@ DEFAULT_INSTALL_ROOT="/var/www/aetherpanel"
 DEFAULT_FRONTEND_PORT="3000"
 PHP_VERSION="${PHP_VERSION:-8.3}"
 PANEL_REPO_URL="${PANEL_REPO_URL:-https://github.com/officialpriyam/AetherPanel.git}"
+OS_ID=""
+OS_VERSION_ID=""
+OS_CODENAME=""
 
 INSTALL_ROOT=""
 BACKEND_DIR=""
@@ -82,14 +85,27 @@ require_root() {
     fi
 }
 
-ensure_ubuntu() {
+ensure_supported_linux() {
     [[ -f /etc/os-release ]] || fail "Cannot determine the operating system."
     # shellcheck disable=SC1091
     source /etc/os-release
 
-    if [[ "${ID:-}" != "ubuntu" ]]; then
-        fail "This installer currently targets Ubuntu 22.04/24.04."
-    fi
+    OS_ID="${ID:-}"
+    OS_VERSION_ID="${VERSION_ID:-}"
+    OS_CODENAME="${VERSION_CODENAME:-${UBUNTU_CODENAME:-}}"
+
+    case "${OS_ID}" in
+        ubuntu)
+            [[ "${OS_VERSION_ID}" == "22.04" || "${OS_VERSION_ID}" == "24.04" ]] || fail "This installer supports Ubuntu 22.04/24.04 and Debian 12/13."
+            ;;
+        debian)
+            [[ "${OS_VERSION_ID}" == "12" || "${OS_VERSION_ID}" == "13" ]] || fail "This installer supports Ubuntu 22.04/24.04 and Debian 12/13."
+            [[ -n "${OS_CODENAME}" ]] || fail "Cannot determine the Debian release codename from /etc/os-release."
+            ;;
+        *)
+            fail "This installer supports Ubuntu 22.04/24.04 and Debian 12/13."
+            ;;
+    esac
 }
 
 prompt() {
@@ -209,9 +225,27 @@ run_as_app() {
 }
 
 install_php_repository() {
-    if ! grep -Rqs "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
-        add-apt-repository -y ppa:ondrej/php
-    fi
+    case "${OS_ID}" in
+        ubuntu)
+            if ! grep -Rqs "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+                add-apt-repository -y ppa:ondrej/php
+            fi
+            ;;
+        debian)
+            mkdir -p /etc/apt/keyrings
+
+            if ! grep -Rqs "packages.sury.org/php" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+                curl -fsSL https://packages.sury.org/php/apt.gpg -o /etc/apt/keyrings/sury-php.gpg
+                chmod a+r /etc/apt/keyrings/sury-php.gpg
+                cat > /etc/apt/sources.list.d/sury-php.list <<EOF
+deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${OS_CODENAME} main
+EOF
+            fi
+            ;;
+        *)
+            fail "Unsupported operating system for PHP repository bootstrap: ${OS_ID}."
+            ;;
+    esac
 }
 
 install_node_repository() {
@@ -233,7 +267,7 @@ install_system_packages() {
     export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
-    apt-get install -y software-properties-common ca-certificates curl gnupg lsb-release unzip git rsync nginx mariadb-server certbot python3-certbot-nginx redis-server build-essential
+    apt-get install -y apt-transport-https software-properties-common ca-certificates curl gnupg lsb-release unzip git rsync nginx mariadb-server certbot python3-certbot-nginx redis-server build-essential
 
     install_php_repository
     apt-get update
@@ -826,7 +860,7 @@ print_summary() {
 
 main() {
     require_root
-    ensure_ubuntu
+    ensure_supported_linux
     collect_install_configuration
     install_system_packages
     prepare_app_user

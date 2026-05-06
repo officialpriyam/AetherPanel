@@ -875,6 +875,32 @@ body::-webkit-scrollbar,
     max-width: 560px;
 }
 
+.admin-field--compact {
+    max-width: 260px;
+}
+
+.admin-inline-section {
+    display: grid;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--admin-border);
+}
+
+.admin-inline-section__header {
+    display: grid;
+    gap: 4px;
+}
+
+.admin-inline-section__header strong {
+    color: var(--admin-text);
+    font-size: 0.95rem;
+}
+
+.admin-inline-section__header small {
+    color: var(--admin-text-faint);
+    line-height: 1.5;
+}
+
 .admin-field span {
     font-size: 13px;
     font-weight: 700;

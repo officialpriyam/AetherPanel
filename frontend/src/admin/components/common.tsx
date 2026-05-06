@@ -139,16 +139,28 @@ function SubnavTabs({ baseHref, items, activeId }: { baseHref: string; items: { 
     );
 }
 
-function FieldEditor({ field, value, onChange, refs }: { field: FormField; value: string; onChange: (value: string) => void; refs?: Record<string, any> }) {
+function FieldEditor({
+    field,
+    value,
+    onChange,
+    refs,
+    values,
+}: {
+    field: FormField;
+    value: string;
+    onChange: (value: string) => void;
+    refs?: Record<string, any>;
+    values?: Record<string, string>;
+}) {
     const baseProps = {
         value,
         onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => onChange(event.currentTarget.value),
     };
-    const selectOptions = field.type === 'select' ? (field.getOptions ? field.getOptions(refs || {}) : field.options || []) : [];
+    const selectOptions = field.type === 'select' ? (field.getOptions ? field.getOptions(refs || {}, values || {}) : field.options || []) : [];
     const hasCurrentValue = selectOptions.some((option) => String(option.value) === value);
 
     return (
-        <label className="admin-field">
+        <label className={`admin-field${field.inputWidth === 'compact' ? ' admin-field--compact' : ''}`}>
             <span>{field.label}</span>
             {field.type === 'textarea' || field.type === 'list' ? <textarea {...baseProps} rows={field.rows || 5} /> : null}
             {field.type === 'select' ? (

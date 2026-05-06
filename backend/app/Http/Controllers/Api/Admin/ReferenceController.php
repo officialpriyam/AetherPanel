@@ -182,7 +182,8 @@ class ReferenceController extends Controller
         $nestLookup = $nests->keyBy('id');
 
         return Egg::query()
-            ->select(['id', 'nest_id', 'name'])
+            ->select(['id', 'nest_id', 'name', 'docker_images', 'startup'])
+            ->with('variables')
             ->orderBy('name')
             ->get()
             ->map(fn (Egg $egg) => [
@@ -190,6 +191,21 @@ class ReferenceController extends Controller
                 'nest_id' => $egg->nest_id,
                 'name' => $egg->name,
                 'nest_name' => $nestLookup->get($egg->nest_id)?->name,
+                'docker_images' => $egg->docker_images ?? [],
+                'docker_image' => collect($egg->docker_images ?? [])->values()->first() ?? '',
+                'startup' => $egg->startup,
+                'variables' => $egg->variables->map(fn ($variable) => [
+                    'id' => $variable->id,
+                    'name' => $variable->name,
+                    'description' => $variable->description,
+                    'env_variable' => $variable->env_variable,
+                    'default_value' => $variable->default_value,
+                    'user_viewable' => (bool) $variable->user_viewable,
+                    'user_editable' => (bool) $variable->user_editable,
+                    'rules' => $variable->rules,
+                    'required' => (bool) $variable->required,
+                    'field_type' => 'text',
+                ])->values(),
             ])
             ->values();
     }

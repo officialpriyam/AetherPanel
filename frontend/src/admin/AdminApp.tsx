@@ -32,7 +32,7 @@ const OverviewPage = dynamic(() => import('./sections/OverviewPage'), {
     loading: () => <PanelLoading ariaLabel={'Loading overview'} embedded />,
 });
 const EggManagementPage = dynamic(() => import('./sections/EggManagementPage'), {
-    loading: () => <PanelLoading ariaLabel={'Loading egg management'} embedded />,
+    loading: () => <PanelLoading ariaLabel={'Loading shell management'} embedded />,
 });
 
 export default function AdminApp() {

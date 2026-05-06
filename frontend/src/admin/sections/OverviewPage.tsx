@@ -255,7 +255,8 @@ export default function OverviewPage({ brandName, username }: { brandName: strin
                                 </div>
                                 <StatusBadge tone={themeState.tone}>{themeState.label}</StatusBadge>
                             </div>
-                            {data?.theme?.repository ? <a className="admin-inline-link" href={data.theme.repository} target="_blank" rel="noreferrer">Open Repository <Glyph icon={LuExternalLink} /></a> : null}
+                            {data?.software?.repository ? <a className="admin-inline-link" href={data.software.latest_url || data.software.repository} target="_blank" rel="noreferrer">Open AetherPanel Repository <Glyph icon={LuExternalLink} /></a> : null}
+                            {data?.theme?.repository ? <a className="admin-inline-link" href={data.theme.repository} target="_blank" rel="noreferrer">Open Theme Repository <Glyph icon={LuExternalLink} /></a> : null}
                         </Panel>
                     </div>
                 </>

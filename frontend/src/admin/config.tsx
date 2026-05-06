@@ -53,8 +53,9 @@ export interface FormField {
     placeholder?: string;
     rows?: number;
     options?: FormFieldOption[];
-    getOptions?: (refs: Record<string, any>) => FormFieldOption[];
+    getOptions?: (refs: Record<string, any>, values?: Record<string, string>) => FormFieldOption[];
     emptyOptionLabel?: string;
+    inputWidth?: 'default' | 'compact';
 }
 
 export interface FormFieldGroup {
@@ -85,7 +86,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     { id: 'servers', label: 'Servers', href: '/admin/servers', icon: LuServer, group: 'management' },
     { id: 'users', label: 'Users', href: '/admin/users', icon: LuUsers, group: 'management' },
     { id: 'mounts', label: 'Mounts', href: '/admin/mounts', icon: LuFolder, group: 'service' },
-    { id: 'nests', label: 'Nests', href: '/admin/nests', icon: LuLayoutGrid, group: 'service' },
+    { id: 'nests', label: 'Cores', href: '/admin/nests', icon: LuLayoutGrid, group: 'service' },
 ];
 
 export const SETTINGS_PAGES: AdminSubPage[] = [
@@ -105,7 +106,7 @@ export const FLASH_PAGES: AdminSubPage[] = [
     { id: 'colors', label: 'Colors', description: 'Dark and light theme palettes used across the Flash interface.' },
     { id: 'advanced', label: 'Advanced', description: 'Accessibility, search, profile, and extra Flash behaviors.' },
     { id: 'social', label: 'Socials', description: 'Community links, support endpoints, and secondary link buttons.' },
-    { id: 'eggs', label: 'Eggs', description: 'Per-addon egg targeting used by Flash add-on integrations.' },
+    { id: 'eggs', label: 'Shells', description: 'Per-addon shell targeting used by Flash add-on integrations.' },
     { id: 'addons', label: 'Addons', description: 'Enable or disable Flash add-on features from the admin UI.' },
     { id: 'meta', label: 'Meta', description: 'OpenGraph, favicon, and page metadata shown outside the panel.' },
     { id: 'mail', label: 'Mail', description: 'Email branding and social links for outgoing notifications.' },
@@ -463,15 +464,15 @@ export const FLASH_FIELD_GROUPS: FormFieldGroup[] = [
     {
         id: 'flash-eggs',
         page: 'eggs',
-        title: 'Egg Targeting',
+        title: 'Shell Targeting',
         description: 'Comma-separated egg sets used by each Flash add-on.',
         fields: [
-            { key: 'addon_plugin_installer_eggs', label: 'Plugin Installer Eggs', type: 'textarea', description: 'Egg IDs used by the plugin installer.', rows: 3 },
-            { key: 'addon_mod_installer_eggs', label: 'Mod Installer Eggs', type: 'textarea', description: 'Egg IDs used by the mod installer.', rows: 3 },
-            { key: 'addon_modpack_installer_eggs', label: 'Modpack Installer Eggs', type: 'textarea', description: 'Egg IDs used by the modpack installer.', rows: 3 },
-            { key: 'addon_subdomain_eggs', label: 'Subdomain Eggs', type: 'textarea', description: 'Egg IDs that expose subdomain controls.', rows: 3 },
-            { key: 'addon_split_eggs', label: 'Split Eggs', type: 'textarea', description: 'Egg IDs that support split controls.', rows: 3 },
-            { key: 'addon_version_changer_eggs', label: 'Version Changer Eggs', type: 'textarea', description: 'Egg IDs allowed to use the version changer.', rows: 3 },
+            { key: 'addon_plugin_installer_eggs', label: 'Plugin Installer Shells', type: 'textarea', description: 'Shell IDs used by the plugin installer.', rows: 3 },
+            { key: 'addon_mod_installer_eggs', label: 'Mod Installer Shells', type: 'textarea', description: 'Shell IDs used by the mod installer.', rows: 3 },
+            { key: 'addon_modpack_installer_eggs', label: 'Modpack Installer Shells', type: 'textarea', description: 'Shell IDs used by the modpack installer.', rows: 3 },
+            { key: 'addon_subdomain_eggs', label: 'Subdomain Shells', type: 'textarea', description: 'Shell IDs that expose subdomain controls.', rows: 3 },
+            { key: 'addon_split_eggs', label: 'Split Shells', type: 'textarea', description: 'Shell IDs that support split controls.', rows: 3 },
+            { key: 'addon_version_changer_eggs', label: 'Version Changer Shells', type: 'textarea', description: 'Shell IDs allowed to use the version changer.', rows: 3 },
         ],
     },
     {
@@ -542,7 +543,7 @@ export const SECTION_DESCRIPTIONS: Record<AdminSectionId, string> = {
     servers: 'Provisioned workloads, startup rules, and operational controls.',
     users: 'Accounts, permissions, and identity management.',
     mounts: 'Shared mounts and their server and node assignments.',
-    nests: 'Provisioning templates and egg definitions.',
+    nests: 'Provisioning cores and shell definitions.',
 };
 
 export const SECTION_ICONS: Record<AdminSectionId, IconType> = {
@@ -572,5 +573,5 @@ export const SECTION_TITLES: Record<AdminSectionId, string> = {
     servers: 'Servers',
     users: 'Users',
     mounts: 'Mounts',
-    nests: 'Nests',
+    nests: 'Cores',
 };

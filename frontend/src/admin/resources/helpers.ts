@@ -1,5 +1,5 @@
 import type { ResourceSection } from '../types';
-import { createPayloadForServer, DAEMON_BASE_PRESETS } from './definitions';
+import { createPayloadForServer, DAEMON_BASE_PRESETS, getEggVariableDefinitions } from './definitions';
 import { formatScalar, inputToFieldValue } from '../utils';
 
 export const LEGACY_DAEMON_BASE_ALIASES: Record<string, string> = {
@@ -110,9 +110,18 @@ export function mapEntityToFormState(section: ResourceSection, item: Record<stri
     return item;
 }
 
-export function buildCreatePayload(section: ResourceSection, state: Record<string, string>) {
+export function buildCreatePayload(section: ResourceSection, state: Record<string, string>, refs: Record<string, any> = {}) {
     if (section === 'servers') {
-        return createPayloadForServer(state);
+        const environment = getEggVariableDefinitions(refs, state.egg).reduce<Record<string, string>>((carry, variable) => {
+            const key = `env__${variable.env_variable}`;
+            carry[variable.env_variable] = state[key] ?? String(variable.default_value ?? '');
+            return carry;
+        }, {});
+
+        return createPayloadForServer({
+            ...state,
+            environment_json: JSON.stringify(environment),
+        });
     }
 
     if (section === 'api') {

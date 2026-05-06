@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import copy from 'copy-to-clipboard';
 import { LuArrowUpRight, LuCopy, LuPlus, LuShield } from 'react-icons/lu';
 import PanelLoading from '@/panel/PanelLoading';
 import { adminHttp, toHuman } from '../api';
 import type { AdminRoute } from '../types';
-import { Banner, DetailList, Glyph, Panel, SimpleTable } from '../components/common';
-import { formatScalar, getRelationItems } from '../utils';
+import { Banner, DetailList, Glyph, Panel, SimpleTable, StatusBadge } from '../components/common';
+import { formatScalar, getRelationItems, normalizeApiPayload } from '../utils';
 import { normalizeDaemonBasePathValue } from '../resources';
 
 const sanitizeConfiguration = (value: string): string =>
@@ -39,15 +39,52 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
     const [error, setError] = useState<string | null>(null);
     const [busy, setBusy] = useState<string | null>(null);
     const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
+    const [liveAllocations, setLiveAllocations] = useState<Record<string, any>[]>([]);
+    const [allocationsLoaded, setAllocationsLoaded] = useState(false);
+    const [nodeStatus, setNodeStatus] = useState<Record<string, any> | null>(null);
     const [allocationState, setAllocationState] = useState({ ip: '', alias: '', ports: '' });
 
-    const allocations = getRelationItems(item, 'allocations');
+    const loadAllocations = useCallback(async () => {
+        setAllocationsLoaded(false);
+
+        try {
+            const { data } = await adminHttp.get(`/api/application/nodes/${item.id}/allocations`, {
+                params: { per_page: 200 },
+            });
+
+            setLiveAllocations(Array.isArray(normalizeApiPayload(data)) ? normalizeApiPayload(data) : []);
+        } catch {
+            setLiveAllocations(getRelationItems(item, 'allocations'));
+        } finally {
+            setAllocationsLoaded(true);
+        }
+    }, [item, item.id]);
+
+    const loadNodeStatus = useCallback(async () => {
+        try {
+            const { data } = await adminHttp.get(`/api/admin/nodes/${item.id}/status`);
+            setNodeStatus(data?.data ?? null);
+        } catch {
+            setNodeStatus({
+                online: false,
+                status: 'offline',
+                version: null,
+            });
+        }
+    }, [item.id]);
+
+    const allocations = allocationsLoaded ? liveAllocations : getRelationItems(item, 'allocations');
     const servers = getRelationItems(item, 'servers');
     const defaultAllocationIp = allocations[0]?.ip || item.fqdn || '';
 
     useEffect(() => {
         setAllocationState({ ip: defaultAllocationIp, alias: '', ports: '' });
     }, [item.id, defaultAllocationIp]);
+
+    useEffect(() => {
+        loadAllocations();
+        loadNodeStatus();
+    }, [loadAllocations, loadNodeStatus]);
 
     useEffect(() => {
         if (route.tab !== 'configuration') {
@@ -87,6 +124,50 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
     const prefersWindowsCommand = daemonBase.toLowerCase().startsWith('c:\\');
     const installCommand = prefersWindowsCommand ? buildWindowsInstallCommand(configuration) : buildLinuxInstallCommand(configuration);
     const installCommandLabel = prefersWindowsCommand ? 'PowerShell Install Command' : 'Linux Install Command';
+    const nodeStatusLabel = nodeStatus?.online ? 'Online' : nodeStatus ? 'Offline' : 'Checking';
+    const nodeStatusTone = nodeStatus?.online ? 'success' : nodeStatus ? 'danger' : 'neutral';
+    const connectivityPanel = (
+        <Panel
+            title="Node Connectivity"
+            copy="The panel checks Wings reachability directly and caches the result briefly to avoid hammering the node."
+            actions={(
+                <button
+                    type="button"
+                    className="admin-button"
+                    disabled={busy === 'node-status'}
+                    onClick={async () => {
+                        setBusy('node-status');
+                        try {
+                            await loadNodeStatus();
+                        } finally {
+                            setBusy(null);
+                        }
+                    }}
+                >
+                    {busy === 'node-status' ? 'Refreshing...' : 'Refresh Status'}
+                </button>
+            )}
+        >
+            <div className="admin-detail-grid">
+                <div className="admin-detail-grid__item">
+                    <span>Connectivity</span>
+                    <strong><StatusBadge tone={nodeStatusTone}>{nodeStatusLabel}</StatusBadge></strong>
+                </div>
+                <div className="admin-detail-grid__item">
+                    <span>Wings Version</span>
+                    <strong>{formatScalar(nodeStatus?.version)}</strong>
+                </div>
+                <div className="admin-detail-grid__item">
+                    <span>Operating System</span>
+                    <strong>{formatScalar(nodeStatus?.system?.type)}</strong>
+                </div>
+                <div className="admin-detail-grid__item">
+                    <span>Architecture</span>
+                    <strong>{formatScalar(nodeStatus?.system?.arch)}</strong>
+                </div>
+            </div>
+        </Panel>
+    );
 
     useEffect(() => {
         if (!copiedTarget) {
@@ -115,6 +196,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                     title="Node Settings"
                     items={[
                         ['Node ID', formatScalar(item.id)],
+                        ['Node Status', nodeStatusLabel],
                         ['Location', formatScalar(locationLabel)],
                         ['Location ID', formatScalar(item.location_id)],
                         ['FQDN', formatScalar(item.fqdn)],
@@ -122,6 +204,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                         ['Maintenance', item.maintenance_mode ? 'Enabled' : 'Disabled'],
                     ]}
                 />
+                {connectivityPanel}
                 <Panel title="Security" copy="Rotate the node deploy token if you need to reconnect Wings safely.">
                     <div className="admin-actions-grid">
                         <button
@@ -229,36 +312,6 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
         return (
             <>
                 {error ? <Banner tone="danger">{error}</Banner> : null}
-                <SimpleTable
-                    title="Allocations"
-                    columns={['IP', 'Alias', 'Port', 'Assigned', 'Actions']}
-                    rows={allocations.map((allocation) => [
-                        allocation.ip,
-                        allocation.alias || '-',
-                        allocation.port,
-                        allocation.assigned ? 'Yes' : 'No',
-                        <button
-                            key={`allocation-${allocation.id}`}
-                            type="button"
-                            className="admin-button admin-button--danger"
-                            onClick={async () => {
-                                if (!window.confirm('Delete this allocation?')) {
-                                    return;
-                                }
-                                try {
-                                    await adminHttp.get('/sanctum/csrf-cookie');
-                                    await adminHttp.delete(`/api/application/nodes/${item.id}/allocations/${allocation.id}`);
-                                    await refresh();
-                                } catch (actionError) {
-                                    setError(toHuman(actionError));
-                                }
-                            }}
-                        >
-                            Delete
-                        </button>,
-                    ])}
-                    emptyLabel="No allocations are attached to this node yet."
-                />
                 <Panel title="Create Allocations" copy="Enter an IP address or hostname and one or more ports or ranges. Ports must be greater than 1024.">
                     <form className="admin-form-grid admin-form-grid--stacked" onSubmit={async (event) => {
                         event.preventDefault();
@@ -291,6 +344,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                             });
                             setAllocationState({ ip: defaultAllocationIp, alias: '', ports: '' });
                             await refresh();
+                            await loadAllocations();
                         } catch (actionError) {
                             setError(toHuman(actionError));
                         } finally {
@@ -305,7 +359,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                             const value = event.currentTarget.value;
                             setAllocationState((current) => ({ ...current, alias: value }));
                         }} /></label>
-                        <label className="admin-field"><span>Ports</span><textarea rows={4} value={allocationState.ports} onChange={(event) => {
+                        <label className="admin-field admin-field--compact"><span>Ports</span><input placeholder="25565, 25566-25570" value={allocationState.ports} onChange={(event) => {
                             const value = event.currentTarget.value;
                             setAllocationState((current) => ({ ...current, ports: value }));
                         }} /></label>
@@ -315,6 +369,37 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                         </button>
                     </form>
                 </Panel>
+                <SimpleTable
+                    title="Allocations"
+                    columns={['IP', 'Alias', 'Port', 'Assigned', 'Actions']}
+                    rows={allocations.map((allocation) => [
+                        allocation.ip,
+                        allocation.alias || '-',
+                        allocation.port,
+                        allocation.assigned ? 'Yes' : 'No',
+                        <button
+                            key={`allocation-${allocation.id}`}
+                            type="button"
+                            className="admin-button admin-button--danger"
+                            onClick={async () => {
+                                if (!window.confirm('Delete this allocation?')) {
+                                    return;
+                                }
+                                try {
+                                    await adminHttp.get('/sanctum/csrf-cookie');
+                                    await adminHttp.delete(`/api/application/nodes/${item.id}/allocations/${allocation.id}`);
+                                    await refresh();
+                                    await loadAllocations();
+                                } catch (actionError) {
+                                    setError(toHuman(actionError));
+                                }
+                            }}
+                        >
+                            Delete
+                        </button>,
+                    ])}
+                    emptyLabel="No allocations are attached to this node yet."
+                />
             </>
         );
     }
@@ -342,6 +427,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
             <DetailList
                 title="Capacity"
                 items={[
+                    ['Node Status', nodeStatusLabel],
                     ['Memory', `${item.memory} MiB`],
                     ['Disk', `${item.disk} MiB`],
                     ['Upload Size', `${item.upload_size ?? '-'} MiB`],
@@ -349,6 +435,7 @@ export default function NodeDetailPanels({ item, refs, refresh, route }: { item:
                     ['SFTP Port', String(item.daemon_sftp ?? '-')],
                 ]}
             />
+            {connectivityPanel}
             <SimpleTable
                 title="Allocations"
                 columns={['IP', 'Alias', 'Port', 'Assigned']}

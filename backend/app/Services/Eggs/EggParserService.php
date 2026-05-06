@@ -24,6 +24,17 @@ class EggParserService
 
         /** @var array $parsed */
         $parsed = json_decode($file->openFile()->fread($file->getSize()), true, 512, JSON_THROW_ON_ERROR);
+
+        return $this->parseArray($parsed);
+    }
+
+    /**
+     * Validate and normalize a parsed egg array payload.
+     *
+     * @throws InvalidFileUploadException
+     */
+    public function parseArray(array $parsed): array
+    {
         if (!in_array(Arr::get($parsed, 'meta.version') ?? '', ['PTDL_v1', 'PTDL_v2'])) {
             throw new InvalidFileUploadException('The JSON file provided is not in a format that can be recognized.');
         }

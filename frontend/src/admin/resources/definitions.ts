@@ -35,7 +35,7 @@ const buildUserOptions = (refs: Record<string, any>): FormFieldOption[] =>
         label: `#${user.id} - ${user.username}${user.email ? ` (${user.email})` : ''}`,
     })));
 
-const collectEggRefs = (refs: Record<string, any>): Record<string, any>[] => {
+export const collectEggRefs = (refs: Record<string, any>): Record<string, any>[] => {
     if (Array.isArray(refs.eggs) && refs.eggs.length > 0) {
         return refs.eggs;
     }
@@ -48,11 +48,92 @@ const collectEggRefs = (refs: Record<string, any>): Record<string, any>[] => {
     );
 };
 
-const buildEggOptions = (refs: Record<string, any>): FormFieldOption[] =>
-    sortOptions(collectEggRefs(refs).map((egg: Record<string, any>) => ({
+const buildEggOptions = (refs: Record<string, any>, values: Record<string, string> = {}): FormFieldOption[] =>
+    sortOptions(collectEggRefs(refs)
+        .filter((egg: Record<string, any>) => !values.nest || String(egg.nest_id) === String(values.nest))
+        .map((egg: Record<string, any>) => ({
         value: egg.id,
         label: `#${egg.id} - ${egg.name}${egg.nest_name ? ` (${egg.nest_name})` : ''}`,
     })));
+
+const normalizeEggDockerImages = (value: unknown): Array<{ label: string; value: string }> => {
+    if (Array.isArray(value)) {
+        return value
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean)
+            .map((entry) => ({ label: entry, value: entry }));
+    }
+
+    if (value && typeof value === 'object') {
+        return Object.entries(value as Record<string, unknown>)
+            .map(([label, image]) => {
+                const normalizedLabel = String(label || '').trim();
+                const normalizedValue = String(image || '').trim();
+
+                if (!normalizedValue) {
+                    return null;
+                }
+
+                return {
+                    label: normalizedLabel || normalizedValue,
+                    value: normalizedValue,
+                };
+            })
+            .filter((entry): entry is { label: string; value: string } => Boolean(entry));
+    }
+
+    const normalized = String(value || '').trim();
+
+    return normalized ? [{ label: normalized, value: normalized }] : [];
+};
+
+export const findEggReference = (refs: Record<string, any>, eggId: string | number | null | undefined): Record<string, any> | null => {
+    const normalizedId = String(eggId || '').trim();
+
+    if (!normalizedId) {
+        return null;
+    }
+
+    return collectEggRefs(refs).find((egg: Record<string, any>) => String(egg.id) === normalizedId) ?? null;
+};
+
+export const getEggRuntimeDefaults = (refs: Record<string, any>, eggId: string | number | null | undefined) => {
+    const egg = findEggReference(refs, eggId);
+    const imageOptions = egg ? normalizeEggDockerImages(egg.docker_images) : [];
+    const defaultImage = egg?.docker_image
+        ? String(egg.docker_image)
+        : imageOptions[0]?.value || '';
+
+    return {
+        egg,
+        startup: String(egg?.startup || ''),
+        image: defaultImage,
+        imageOptions,
+    };
+};
+
+export const getEggVariableDefinitions = (refs: Record<string, any>, eggId: string | number | null | undefined): Record<string, any>[] => {
+    const egg = findEggReference(refs, eggId);
+
+    return egg && Array.isArray(egg.variables) ? egg.variables : [];
+};
+
+export const buildEggEnvironmentState = (
+    refs: Record<string, any>,
+    eggId: string | number | null | undefined,
+    current: Record<string, string> = {}
+): Record<string, string> =>
+    getEggVariableDefinitions(refs, eggId).reduce<Record<string, string>>((state, variable) => {
+        const key = `env__${variable.env_variable}`;
+        state[key] = current[key] ?? String(variable.default_value ?? '');
+        return state;
+    }, {});
+
+const buildDockerImageOptions = (refs: Record<string, any>, values: Record<string, string> = {}): FormFieldOption[] =>
+    getEggRuntimeDefaults(refs, values.egg).imageOptions.map((option) => ({
+        label: option.label,
+        value: option.value,
+    }));
 
 const buildNestOptions = (refs: Record<string, any>): FormFieldOption[] =>
     sortOptions((refs.nests || []).map((nest: Record<string, any>) => ({
@@ -127,9 +208,10 @@ export const serverCreateFields: FormField[] = [
     { key: 'name', label: 'Server Name', type: 'text', description: 'Primary server display name.' },
     { key: 'description', label: 'Description', type: 'textarea', description: 'Optional server description.', rows: 3 },
     { key: 'user', label: 'Owner', type: 'select', description: 'Choose the user that owns this server.', getOptions: buildUserOptions, emptyOptionLabel: 'Select an owner' },
+    { key: 'nest', label: 'Core', type: 'select', description: 'Choose the core that groups the available shells.', getOptions: buildNestOptions, emptyOptionLabel: 'Select a core' },
     { key: 'allocation_default', label: 'Default Allocation', type: 'select', description: 'Choose the primary allocation for this server.', getOptions: buildFreeAllocationOptions, emptyOptionLabel: 'Select an allocation' },
-    { key: 'egg', label: 'Egg', type: 'select', description: 'Choose the egg used to define this server.', getOptions: buildEggOptions, emptyOptionLabel: 'Select an egg' },
-    { key: 'docker_image', label: 'Docker Image', type: 'text', description: 'Docker image used at runtime.' },
+    { key: 'egg', label: 'Shell', type: 'select', description: 'Choose the shell used to define this server.', getOptions: buildEggOptions, emptyOptionLabel: 'Select a shell' },
+    { key: 'docker_image', label: 'Docker Image', type: 'select', description: 'Choose from the images exposed by the selected shell.', getOptions: buildDockerImageOptions, emptyOptionLabel: 'Select a shell first' },
     { key: 'startup', label: 'Startup Command', type: 'text', description: 'Startup command template.' },
     { key: 'limits_memory', label: 'Memory (MiB)', type: 'number', description: 'Memory limit.' },
     { key: 'limits_swap', label: 'Swap (MiB)', type: 'number', description: 'Swap limit.' },
@@ -140,10 +222,9 @@ export const serverCreateFields: FormField[] = [
     { key: 'feature_limits_databases', label: 'Database Limit', type: 'number', description: 'Allowed databases.' },
     { key: 'feature_limits_allocations', label: 'Allocation Limit', type: 'number', description: 'Allowed extra allocations.' },
     { key: 'feature_limits_backups', label: 'Backup Limit', type: 'number', description: 'Allowed backups.' },
-    { key: 'skip_scripts', label: 'Skip Install Script', type: 'boolean', description: 'Skip the egg install script.' },
+    { key: 'skip_scripts', label: 'Skip Install Script', type: 'boolean', description: 'Skip the shell install script.' },
     { key: 'oom_disabled', label: 'Disable OOM Killer', type: 'boolean', description: 'Allow the container to continue past its memory limit.' },
     { key: 'start_on_completion', label: 'Start On Completion', type: 'boolean', description: 'Automatically start the server after install.' },
-    { key: 'environment_json', label: 'Environment JSON', type: 'textarea', description: 'Raw environment variable object for the egg.', rows: 8 },
 ];
 
 export const serverDetailsFields: FormField[] = [
@@ -169,8 +250,8 @@ export const serverBuildFields: FormField[] = [
 
 export const serverStartupFields: FormField[] = [
     { key: 'startup', label: 'Startup Command', type: 'text', description: 'Startup template used by the server.' },
-    { key: 'egg', label: 'Egg', type: 'select', description: 'Choose the egg used by the server.', getOptions: buildEggOptions, emptyOptionLabel: 'Select an egg' },
-    { key: 'image', label: 'Docker Image', type: 'text', description: 'Docker image override.' },
+    { key: 'egg', label: 'Shell', type: 'select', description: 'Choose the shell used by the server.', getOptions: buildEggOptions, emptyOptionLabel: 'Select a shell' },
+    { key: 'image', label: 'Docker Image', type: 'select', description: 'Choose from the images exposed by the selected shell.', getOptions: buildDockerImageOptions, emptyOptionLabel: 'Select a shell first' },
     { key: 'skip_scripts', label: 'Skip Scripts', type: 'boolean', description: 'Skip install scripts during update.' },
     { key: 'environment_json', label: 'Environment JSON', type: 'textarea', description: 'Raw environment key/value object.', rows: 8 },
 ];
@@ -185,19 +266,19 @@ export const mountFields: FormField[] = [
 ];
 
 export const nestFields: FormField[] = [
-    { key: 'name', label: 'Name', type: 'text', description: 'Nest name shown in provisioning flows.' },
-    { key: 'description', label: 'Description', type: 'textarea', description: 'Short description for this nest.', rows: 4 },
+    { key: 'name', label: 'Core Name', type: 'text', description: 'Core name shown in provisioning flows.' },
+    { key: 'description', label: 'Description', type: 'textarea', description: 'Short description for this core.', rows: 4 },
 ];
 
 export const eggFields: FormField[] = [
-    { key: 'nest_id', label: 'Nest', type: 'select', description: 'Choose the parent nest for this egg.', getOptions: buildNestOptions, emptyOptionLabel: 'Select a nest' },
-    { key: 'name', label: 'Name', type: 'text', description: 'Egg name shown to administrators.' },
+    { key: 'nest_id', label: 'Core', type: 'select', description: 'Choose the parent core for this shell.', getOptions: buildNestOptions, emptyOptionLabel: 'Select a core' },
+    { key: 'name', label: 'Shell Name', type: 'text', description: 'Shell name shown to administrators.' },
     { key: 'image', label: 'Image URL', type: 'url', description: 'Optional remote image used by some themes.' },
-    { key: 'description', label: 'Description', type: 'textarea', description: 'Egg description.', rows: 4 },
+    { key: 'description', label: 'Description', type: 'textarea', description: 'Shell description.', rows: 4 },
     { key: 'docker_images', label: 'Docker Images', type: 'textarea', description: 'One image per line. Use label|image to provide aliases.', rows: 6 },
     { key: 'startup', label: 'Startup', type: 'textarea', description: 'Startup command template.', rows: 4 },
-    { key: 'config_from', label: 'Config From Egg', type: 'select', description: 'Optionally copy configuration defaults from another egg.', getOptions: buildEggOptions, emptyOptionLabel: 'Do not inherit from another egg' },
-    { key: 'config_stop', label: 'Stop Command', type: 'text', description: 'Stop command used by the egg.' },
+    { key: 'config_from', label: 'Config From Shell', type: 'select', description: 'Optionally copy configuration defaults from another shell.', getOptions: buildEggOptions, emptyOptionLabel: 'Do not inherit from another shell' },
+    { key: 'config_stop', label: 'Stop Command', type: 'text', description: 'Stop command used by the shell.' },
     { key: 'config_startup', label: 'Startup Detection JSON', type: 'textarea', description: 'Raw JSON for startup parsing.', rows: 5 },
     { key: 'config_logs', label: 'Log Parsing JSON', type: 'textarea', description: 'Raw JSON for log parsing.', rows: 5 },
     { key: 'config_files', label: 'Config Files JSON', type: 'textarea', description: 'Raw JSON describing editable files.', rows: 5 },
@@ -215,7 +296,7 @@ export const eggVariableFields: FormField[] = [
 ];
 
 export const eggScriptFields: FormField[] = [
-    { key: 'copy_script_from', label: 'Copy Script From Egg', type: 'select', description: 'Optionally copy script data from another egg.', getOptions: buildEggOptions, emptyOptionLabel: 'Do not copy from another egg' },
+    { key: 'copy_script_from', label: 'Copy Script From Shell', type: 'select', description: 'Optionally copy script data from another shell.', getOptions: buildEggOptions, emptyOptionLabel: 'Do not copy from another shell' },
     { key: 'script_is_privileged', label: 'Privileged', type: 'boolean', description: 'Run the install container in privileged mode.' },
     { key: 'script_entry', label: 'Script Entry', type: 'text', description: 'Entrypoint command for installs.' },
     { key: 'script_container', label: 'Script Container', type: 'text', description: 'Container image used for installs.' },
@@ -234,7 +315,7 @@ export const apiKeyFields: FormField[] = [
         { label: 'Read Only', value: 1 },
         { label: 'Read + Write', value: 3 },
     ] },
-    { key: 'r_eggs', label: 'Eggs', type: 'select', description: 'Permission level for eggs.', options: [
+    { key: 'r_eggs', label: 'Shells', type: 'select', description: 'Permission level for shells.', options: [
         { label: 'No Access', value: 0 },
         { label: 'Read Only', value: 1 },
         { label: 'Read + Write', value: 3 },
@@ -244,7 +325,7 @@ export const apiKeyFields: FormField[] = [
         { label: 'Read Only', value: 1 },
         { label: 'Read + Write', value: 3 },
     ] },
-    { key: 'r_nests', label: 'Nests', type: 'select', description: 'Permission level for nests.', options: [
+    { key: 'r_nests', label: 'Cores', type: 'select', description: 'Permission level for cores.', options: [
         { label: 'No Access', value: 0 },
         { label: 'Read Only', value: 1 },
         { label: 'Read + Write', value: 3 },
@@ -283,14 +364,14 @@ export const serverDetailTabs = [
     { id: 'index', label: 'Overview', description: 'Primary server identity and summary details.' },
     { id: 'details', label: 'Details', description: 'Owner, name, external ID, and description.' },
     { id: 'build', label: 'Build', description: 'Limits, allocations, and feature limits.' },
-    { id: 'startup', label: 'Startup', description: 'Startup command, egg, image, and environment.' },
+    { id: 'startup', label: 'Startup', description: 'Startup command, shell, image, and environment.' },
     { id: 'database', label: 'Database', description: 'Server database creation and password resets.' },
     { id: 'manage', label: 'Manage', description: 'Suspend, reinstall, and destructive actions.' },
 ];
 
 export const eggDetailTabs = [
-    { id: 'index', label: 'Details', description: 'Base egg configuration and provisioning fields.' },
-    { id: 'variables', label: 'Variables', description: 'Environment variables attached to the egg.' },
+    { id: 'index', label: 'Details', description: 'Base shell configuration and provisioning fields.' },
+    { id: 'variables', label: 'Variables', description: 'Environment variables attached to the shell.' },
     { id: 'scripts', label: 'Scripts', description: 'Install script configuration and inheritance.' },
 ];
 

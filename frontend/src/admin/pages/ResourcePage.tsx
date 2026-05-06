@@ -9,9 +9,12 @@ import type { AdminRoute, ResourceConfig, ResourceSection } from '../types';
 import type { FormField } from '../config';
 import PanelLoading from '@/panel/PanelLoading';
 import {
+    buildEggEnvironmentState,
     buildCreatePayload,
     buildSummaryItems,
     buildUpdatePayload,
+    getEggVariableDefinitions,
+    getEggRuntimeDefaults,
     mapEntityToFormState,
     normalizeDaemonBasePathValue,
 } from '../resources';
@@ -36,8 +39,8 @@ const CREATE_STEP_LAYOUTS: Partial<Record<ResourceSection, Array<{ label: string
         { label: 'Daemon', keys: ['daemon_base_profile', 'daemon_base', 'daemon_listen', 'daemon_sftp'] },
     ],
     servers: [
-        { label: 'Basics', keys: ['name', 'description', 'user', 'egg', 'allocation_default'] },
-        { label: 'Runtime', keys: ['docker_image', 'startup', 'environment_json'] },
+        { label: 'Basics', keys: ['name', 'description', 'user', 'nest', 'egg', 'allocation_default'] },
+        { label: 'Runtime', keys: ['docker_image', 'startup'] },
         { label: 'Limits', keys: ['limits_memory', 'limits_swap', 'limits_disk', 'limits_io', 'limits_cpu', 'limits_threads'] },
         { label: 'Features', keys: ['feature_limits_databases', 'feature_limits_allocations', 'feature_limits_backups', 'skip_scripts', 'oom_disabled', 'start_on_completion'] },
     ],
@@ -111,6 +114,14 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
     );
     const isFinalCreateStep = createStepIndex >= createSteps.length - 1;
     const activeCreateFields = createSteps[createStepIndex]?.fields ?? config.createFields ?? [];
+    const serverVariableDefinitions = useMemo(
+        () => route.section === 'servers' && route.view === 'new' ? getEggVariableDefinitions(refs, formState.egg) : [],
+        [formState.egg, refs, route.section, route.view]
+    );
+    const visibleServerVariables = useMemo(
+        () => serverVariableDefinitions.filter((variable) => variable.user_viewable || variable.user_editable || variable.required),
+        [serverVariableDefinitions]
+    );
 
     const refresh = async () => {
         setLoading(true);
@@ -201,6 +212,37 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
                 }
             }
 
+            if (route.section === 'servers' && fieldKey === 'egg') {
+                const defaults = getEggRuntimeDefaults(refs, value);
+                const nextEnvironment = buildEggEnvironmentState(refs, value, current);
+
+                if (defaults.egg?.nest_id) {
+                    next.nest = String(defaults.egg.nest_id);
+                }
+
+                if (defaults.image) {
+                    next.docker_image = defaults.image;
+                }
+
+                if (defaults.startup) {
+                    next.startup = defaults.startup;
+                }
+
+                Object.assign(next, nextEnvironment);
+            }
+
+            if (route.section === 'servers' && fieldKey === 'nest') {
+                next.egg = '';
+                next.docker_image = '';
+                next.startup = '';
+
+                Object.keys(next)
+                    .filter((key) => key.startsWith('env__'))
+                    .forEach((key) => {
+                        delete next[key];
+                    });
+            }
+
             return next;
         });
     };
@@ -223,7 +265,7 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
 
         try {
             await adminHttp.get('/sanctum/csrf-cookie');
-            const payload = buildCreatePayload(route.section, formState);
+            const payload = buildCreatePayload(route.section, formState, refs);
             const response = await adminHttp.post(config.createEndpoint, payload);
             setMessage(`${config.title.slice(0, -1)} created successfully.`);
             if (response?.data?.data?.plaintext) {
@@ -323,9 +365,35 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
                         ) : null}
                         <div className="admin-form-grid admin-form-grid--stacked">
                             {activeCreateFields.map((field) => (
-                                <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => onFieldChange(field.key, value)} refs={refs} />
+                                <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => onFieldChange(field.key, value)} refs={refs} values={formState} />
                             ))}
                         </div>
+                        {route.section === 'servers' && formState.egg && activeCreateFields.some((field) => ['nest', 'egg', 'docker_image', 'startup'].includes(field.key)) ? (
+                            <section className="admin-inline-section">
+                                <div className="admin-inline-section__header">
+                                    <strong>Shell Configuration</strong>
+                                    <small>Required shell variables are preloaded with defaults. Adjust only the values that need to change for this server.</small>
+                                </div>
+                                <div className="admin-form-grid admin-form-grid--stacked">
+                                    {visibleServerVariables.length > 0 ? visibleServerVariables.map((variable) => {
+                                        const fieldKey = `env__${variable.env_variable}`;
+                                        const isRequired = String(variable.rules || '').split('|').includes('required');
+
+                                        return (
+                                            <label key={fieldKey} className="admin-field">
+                                                <span>{variable.name}{isRequired ? ' *' : ''}</span>
+                                                <input
+                                                    value={formState[fieldKey] ?? String(variable.default_value ?? '')}
+                                                    onChange={(event) => onFieldChange(fieldKey, event.currentTarget.value)}
+                                                    placeholder={String(variable.default_value ?? '')}
+                                                />
+                                                {variable.description ? <small>{variable.description}</small> : null}
+                                            </label>
+                                        );
+                                    }) : <div className="admin-empty">This shell does not expose editable server variables.</div>}
+                                </div>
+                            </section>
+                        ) : null}
                         {route.section === 'servers' ? <ServerReferenceHelp refs={refs} /> : null}
                         {route.section === 'nodes' ? <NodeReferenceHelp refs={refs} /> : null}
                     </Panel>
@@ -357,7 +425,7 @@ function ResourcePage({ route, config }: { route: AdminRoute & { section: Resour
                                     <Panel title="Edit" copy="Update the fields below and save when you are ready.">
                                         <div className="admin-form-grid admin-form-grid--stacked">
                                             {config.updateFields.map((field) => (
-                                                <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => onFieldChange(field.key, value)} refs={refs} />
+                                                <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => onFieldChange(field.key, value)} refs={refs} values={formState} />
                                             ))}
                                         </div>
                                     </Panel>

@@ -6,7 +6,7 @@ import { adminHttp, toHuman } from '../api';
 import type { AdminRoute } from '../types';
 import { buildInitialFieldState, formatScalar, getRelationItems } from '../utils';
 import { Banner, DetailList, FieldEditor, Glyph, Panel, SimpleTable } from '../components/common';
-import { serverBuildFields, serverStartupFields } from '../resources/definitions';
+import { getEggRuntimeDefaults, serverBuildFields, serverStartupFields } from '../resources/definitions';
 import { mapEntityToFormState } from '../resources/helpers';
 import ServerReferenceHelp from './ServerReferenceHelp';
 
@@ -66,7 +66,7 @@ export default function ServerDetailPanels({ server, refs, refresh, route }: { s
     );
 
     const startupPanel = (
-        <Panel title="Startup Configuration" copy="Startup command, egg, image, and environment values.">
+        <Panel title="Startup Configuration" copy="Startup command, shell, image, and environment values.">
             <form className="admin-form-grid admin-form-grid--stacked" onSubmit={async (event) => {
                 event.preventDefault();
                 setBusy('startup');
@@ -88,7 +88,30 @@ export default function ServerDetailPanels({ server, refs, refresh, route }: { s
                 }
             }}>
                 {serverStartupFields.map((field) => (
-                    <FieldEditor key={field.key} field={field} value={startupState[field.key] ?? ''} onChange={(value) => setStartupState((current) => ({ ...current, [field.key]: value }))} refs={refs} />
+                    <FieldEditor
+                        key={field.key}
+                        field={field}
+                        value={startupState[field.key] ?? ''}
+                        onChange={(value) => setStartupState((current) => {
+                            const next = { ...current, [field.key]: value };
+
+                            if (field.key === 'egg') {
+                                const defaults = getEggRuntimeDefaults(refs, value);
+
+                                if (defaults.image) {
+                                    next.image = defaults.image;
+                                }
+
+                                if (defaults.startup) {
+                                    next.startup = defaults.startup;
+                                }
+                            }
+
+                            return next;
+                        })}
+                        refs={refs}
+                        values={startupState}
+                    />
                 ))}
                 <button type="submit" className="admin-button admin-button--primary" disabled={busy === 'startup'}><Glyph icon={LuSave} />{busy === 'startup' ? 'Saving...' : 'Save Startup'}</button>
             </form>
@@ -256,7 +279,7 @@ export default function ServerDetailPanels({ server, refs, refresh, route }: { s
                         ['Node', formatScalar(getRelationItems(server, 'node')[0]?.name ?? server.node)],
                         ['Node ID', formatScalar(server.node)],
                         ['Primary Allocation', formatScalar(server.allocation)],
-                        ['Egg', formatScalar(getRelationItems(server, 'egg')[0]?.name ?? server.egg)],
+                        ['Shell', formatScalar(getRelationItems(server, 'egg')[0]?.name ?? server.egg)],
                     ]}
                 />
                 <DetailList

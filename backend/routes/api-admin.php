@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Api\Admin\MountController;
+use Pterodactyl\Http\Controllers\Api\Admin\NodeStatusController;
 use Pterodactyl\Http\Controllers\Api\Admin\TicketController;
 use Pterodactyl\Http\Controllers\Api\Admin\EggController;
 use Pterodactyl\Http\Controllers\Api\Admin\NestController;
 use Pterodactyl\Http\Controllers\Api\Admin\ModuleController;
 use Pterodactyl\Http\Controllers\Api\Admin\OverviewController;
+use Pterodactyl\Http\Controllers\Api\Admin\PropelEggCatalogController;
 use Pterodactyl\Http\Controllers\Api\Admin\FlashSettingsController;
 use Pterodactyl\Http\Controllers\Api\Admin\DatabaseHostController;
 use Pterodactyl\Http\Controllers\Api\Admin\ReferenceController;
@@ -36,11 +38,14 @@ Route::delete('/tickets/categories/{categoryId}', [TicketController::class, 'del
 
 Route::get('/database-hosts', DatabaseHostController::class)->name('api.admin.database-hosts');
 Route::get('/database-hosts/{databaseHost}', [DatabaseHostController::class, 'show'])->name('api.admin.database-hosts.show');
+Route::get('/nodes/{node:id}/status', NodeStatusController::class)->name('api.admin.nodes.status');
 
 Route::get('/references/locations', [ReferenceController::class, 'locations'])->name('api.admin.references.locations');
 Route::get('/references/servers', [ReferenceController::class, 'servers'])->name('api.admin.references.servers');
 Route::get('/references/mounts', [ReferenceController::class, 'mounts'])->name('api.admin.references.mounts');
 Route::get('/references/nests', [ReferenceController::class, 'nests'])->name('api.admin.references.nests');
+Route::get('/propel/hive', [PropelEggCatalogController::class, 'index'])->name('api.admin.propel.hive');
+Route::post('/propel/import', [PropelEggCatalogController::class, 'import'])->name('api.admin.propel.import');
 
 Route::get('/application-api', ApplicationApiKeyController::class)->name('api.admin.application-api');
 Route::post('/application-api', [ApplicationApiKeyController::class, 'store']);

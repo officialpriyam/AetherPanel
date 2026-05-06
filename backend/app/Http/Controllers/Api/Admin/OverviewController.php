@@ -43,18 +43,24 @@ class OverviewController extends Controller
             'latest_wings' => null,
             'discord' => null,
             'donations' => null,
+            'repository' => (string) config('pterodactyl.cdn.repository', ''),
+            'latest_url' => (string) config('pterodactyl.cdn.repository', ''),
             'up_to_date' => true,
         ] : rescue(fn () => [
             'latest_panel' => $this->softwareVersion->getPanel(),
             'latest_wings' => $this->softwareVersion->getDaemon(),
             'discord' => $this->softwareVersion->getDiscord(),
             'donations' => $this->softwareVersion->getDonations(),
+            'repository' => $this->softwareVersion->getRepository(),
+            'latest_url' => $this->softwareVersion->getLatestUrl(),
             'up_to_date' => $this->softwareVersion->isLatestPanel(),
         ], [
             'latest_panel' => null,
             'latest_wings' => null,
             'discord' => null,
             'donations' => null,
+            'repository' => (string) config('pterodactyl.cdn.repository', ''),
+            'latest_url' => (string) config('pterodactyl.cdn.repository', ''),
             'up_to_date' => true,
         ], false);
 

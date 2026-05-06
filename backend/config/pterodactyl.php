@@ -91,9 +91,14 @@ return [
     */
 
     'cdn' => [
-        'enabled' => (bool) panel_runtime_config('PTERODACTYL_CDN_ENABLED', panel_runtime_config('APP_ENV', 'production') !== 'local'),
-        'cache_time' => (int) panel_runtime_config('PTERODACTYL_CDN_CACHE_TIME', 60),
-        'url' => panel_runtime_config('PTERODACTYL_CDN_URL', 'https://cdn.pterodactyl.io/releases/latest.json'),
+        'enabled' => (bool) panel_runtime_config('AETHERPANEL_VERSION_CHECK_ENABLED', panel_runtime_config('APP_ENV', 'production') !== 'local'),
+        'cache_time' => (int) panel_runtime_config('AETHERPANEL_VERSION_CACHE_TIME', 30),
+        'repository' => panel_runtime_config('AETHERPANEL_REPOSITORY', 'https://github.com/officialpriyam/AetherPanel'),
+        'api_release_url' => panel_runtime_config('AETHERPANEL_RELEASE_API', 'https://api.github.com/repos/officialpriyam/AetherPanel/releases/latest'),
+        'api_tags_url' => panel_runtime_config('AETHERPANEL_TAGS_API', 'https://api.github.com/repos/officialpriyam/AetherPanel/tags'),
+        'discord' => panel_runtime_config('AETHERPANEL_DISCORD_URL', ''),
+        'donations' => panel_runtime_config('AETHERPANEL_DONATIONS_URL', ''),
+        'wings_version' => panel_runtime_config('AETHERPANEL_LATEST_WINGS_VERSION', ''),
     ],
 
     /*

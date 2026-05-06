@@ -23,7 +23,7 @@ export default function MountAttachmentPanels({ item, refs, refresh }: { item: R
         <>
             {error ? <Banner tone="danger">{error}</Banner> : null}
             <div className="admin-split-grid">
-                <Panel title="Attach Eggs" copy="Choose one or more eggs to attach to this mount.">
+                <Panel title="Attach Shells" copy="Choose one or more shells to attach to this mount.">
                     <form className="admin-form-grid" onSubmit={async (event) => {
                         event.preventDefault();
                         setBusy('attach-eggs');
@@ -42,7 +42,7 @@ export default function MountAttachmentPanels({ item, refs, refresh }: { item: R
                         }
                     }}>
                         <label className="admin-field">
-                            <span>Eggs</span>
+                            <span>Shells</span>
                             <select multiple value={state.eggs} onChange={(event) => updateSelection('eggs', event)} size={10}>
                                 {(refs.eggs || []).map((egg: Record<string, any>) => (
                                     <option key={egg.id} value={String(egg.id)}>
@@ -51,7 +51,7 @@ export default function MountAttachmentPanels({ item, refs, refresh }: { item: R
                                 ))}
                             </select>
                         </label>
-                        <button type="submit" className="admin-button admin-button--primary" disabled={busy === 'attach-eggs'}><Glyph icon={LuPlus} />{busy === 'attach-eggs' ? 'Attaching...' : 'Attach Eggs'}</button>
+                        <button type="submit" className="admin-button admin-button--primary" disabled={busy === 'attach-eggs'}><Glyph icon={LuPlus} />{busy === 'attach-eggs' ? 'Attaching...' : 'Attach Shells'}</button>
                     </form>
                 </Panel>
                 <Panel title="Attach Nodes" copy="Choose one or more nodes to attach to this mount.">

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { LuArrowUpRight, LuPlus } from 'react-icons/lu';
 import { adminHttp, toHuman } from '../api';
 import { DetailList, Glyph, SimpleTable, StatusBadge } from '../components/common';
@@ -26,6 +26,38 @@ import NodeDetailPanels from '../sections/NodeDetailPanels';
 import ServerDetailPanels from '../sections/ServerDetailPanels';
 import TicketActionPanels from '../sections/TicketActionPanels';
 import TicketCategoryPanel from '../sections/TicketCategoryPanel';
+
+function NodeStatusCell({ nodeId }: { nodeId: number }) {
+    const [status, setStatus] = useState<'loading' | 'online' | 'offline'>('loading');
+
+    useEffect(() => {
+        let active = true;
+
+        adminHttp.get(`/api/admin/nodes/${nodeId}/status`)
+            .then(({ data }) => {
+                if (!active) {
+                    return;
+                }
+
+                setStatus(data?.data?.online ? 'online' : 'offline');
+            })
+            .catch(() => {
+                if (active) {
+                    setStatus('offline');
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [nodeId]);
+
+    if (status === 'loading') {
+        return <StatusBadge tone="neutral">Checking</StatusBadge>;
+    }
+
+    return <StatusBadge tone={status === 'online' ? 'success' : 'danger'}>{status === 'online' ? 'Online' : 'Offline'}</StatusBadge>;
+}
 
 export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
     users: {
@@ -109,6 +141,7 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
             { label: 'Memory', render: (item) => `${item.memory} MiB` },
             { label: 'Disk', render: (item) => `${item.disk} MiB` },
             { label: 'Servers', render: (item) => item.servers_count ?? getRelationItems(item, 'servers').length },
+            { label: 'Status', render: (item) => <NodeStatusCell nodeId={Number(item.id)} /> },
             { label: 'Public', render: (item) => <StatusBadge tone={item.public ? 'success' : 'neutral'}>{item.public ? 'Yes' : 'No'}</StatusBadge> },
         ],
         searchKeys: ['name', 'fqdn', 'description'],
@@ -173,38 +206,38 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
     },
     nests: {
         section: 'nests',
-        title: 'Nests',
+        title: 'Cores',
         listEndpoint: '/api/admin/nests',
         detailEndpoint: (id) => `/api/admin/nests/${id}`,
-        emptyMessage: 'No nests found.',
+        emptyMessage: 'No cores found.',
         columns: [
             { label: 'ID', render: (item) => <code>{item.id}</code> },
             { label: 'Name', render: (item) => item.name },
             { label: 'Author', render: (item) => item.author || '-' },
-            { label: 'Eggs', render: (item) => item.eggs_count ?? getRelationItems(item, 'eggs').length },
+            { label: 'Shells', render: (item) => item.eggs_count ?? getRelationItems(item, 'eggs').length },
             { label: 'Servers', render: (item) => item.servers_count ?? getRelationItems(item, 'servers').length },
         ],
         searchKeys: ['name', 'description', 'author'],
         createFields: nestFields,
         createEndpoint: '/api/admin/nests',
-        createTitle: 'Create Nest',
+        createTitle: 'Create Core',
         updateFields: nestFields,
         updateEndpoint: (id) => `/api/admin/nests/${id}`,
         deleteEndpoint: (id) => `/api/admin/nests/${id}`,
-        deleteLabel: 'Delete Nest',
+        deleteLabel: 'Delete Core',
         renderDetailExtras: (item) => (
             <>
                 <DetailList
-                    title="Nest Summary"
+                    title="Core Summary"
                     items={[
                         ['Author', formatScalar(item.author)],
                         ['Description', formatScalar(item.description)],
-                        ['Egg Count', String(item.eggs_count ?? getRelationItems(item, 'eggs').length)],
+                        ['Shell Count', String(item.eggs_count ?? getRelationItems(item, 'eggs').length)],
                         ['Server Count', String(item.servers_count ?? getRelationItems(item, 'servers').length)],
                     ]}
                 />
                 <SimpleTable
-                    title="Eggs"
+                    title="Shells"
                     columns={['Name', 'Docker Images', 'Startup', 'Open']}
                     rows={(item.eggs || getRelationItems(item, 'eggs')).map((egg: Record<string, any>) => [
                         egg.name,
@@ -212,10 +245,10 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
                         egg.startup || '-',
                         <Link key={egg.id} href={`/admin/nests/egg/${egg.id}`} className="admin-inline-link">Open <Glyph icon={LuArrowUpRight} /></Link>,
                     ])}
-                    emptyLabel="No eggs are linked to this nest."
+                    emptyLabel="No shells are linked to this core."
                 />
                 <div className="admin-actions-row">
-                    <Link href="/admin/nests/egg/new" className="admin-button admin-button--primary"><Glyph icon={LuPlus} />Create Egg</Link>
+                    <Link href="/admin/nests/egg/new" className="admin-button admin-button--primary"><Glyph icon={LuPlus} />Create Shell</Link>
                 </div>
             </>
         ),
@@ -253,13 +286,13 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
                     ]}
                 />
                 <SimpleTable
-                    title="Eggs"
+                    title="Shells"
                     columns={['ID', 'Name', 'Actions']}
                     rows={(item.eggs || []).map((egg: Record<string, any>) => [
                         egg.id,
                         egg.name,
                         <button key={`detach-egg-${egg.id}`} type="button" className="admin-button admin-button--danger" onClick={async () => {
-                            if (!window.confirm('Detach this egg from the mount?')) {
+                            if (!window.confirm('Detach this shell from the mount?')) {
                                 return;
                             }
                             try {
@@ -271,7 +304,7 @@ export const resourceConfigs: Record<ResourceSection, ResourceConfig> = {
                             }
                         }}>Detach</button>,
                     ])}
-                    emptyLabel="No eggs are attached to this mount."
+                    emptyLabel="No shells are attached to this mount."
                 />
                 <SimpleTable
                     title="Nodes"

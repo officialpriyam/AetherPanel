@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { LuPlus, LuSave, LuTrash2 } from 'react-icons/lu';
+import { LuChevronLeft, LuChevronRight, LuDownload, LuPlus, LuSave, LuTrash2 } from 'react-icons/lu';
 import PanelLoading from '@/panel/PanelLoading';
 import { adminHttp, toHuman } from '../api';
 import type { AdminRoute } from '../types';
-import { buildInitialFieldState, formatScalar, getRelationItems } from '../utils';
+import { buildInitialFieldState, formatScalar } from '../utils';
 import { Banner, DetailList, FieldEditor, Glyph, Panel, SimpleTable, SubnavTabs } from '../components/common';
 import { eggDetailTabs, eggFields, eggScriptFields, eggVariableFields, loadNestRefs } from '../resources/definitions';
 
@@ -27,6 +27,13 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [catalogOs, setCatalogOs] = useState<'linux' | 'windows'>('linux');
+    const [catalogPage, setCatalogPage] = useState(1);
+    const [catalogQuery, setCatalogQuery] = useState('');
+    const [catalogLoading, setCatalogLoading] = useState(false);
+    const [catalogItems, setCatalogItems] = useState<Record<string, any>[]>([]);
+    const [catalogMeta, setCatalogMeta] = useState({ current_page: 1, total_pages: 1, total: 0 });
+    const [selectedCatalogItems, setSelectedCatalogItems] = useState<string[]>([]);
 
     const refresh = async () => {
         setLoading(true);
@@ -48,7 +55,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                 }, {}));
             } else {
                 setItem(null);
-                setFormState(buildInitialFieldState(eggFields, { force_outgoing_ip: false }));
+                setFormState(buildInitialFieldState(eggFields, { force_outgoing_ip: false, nest_id: formState.nest_id }));
                 setScriptState(buildInitialFieldState(eggScriptFields, { script_is_privileged: false }));
                 setVariableEditStates({});
             }
@@ -63,11 +70,57 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
         refresh();
     }, [route.view, route.id]);
 
+    useEffect(() => {
+        if (route.view !== 'new' || !formState.nest_id) {
+            setCatalogItems([]);
+            setSelectedCatalogItems([]);
+            return;
+        }
+
+        let active = true;
+        setCatalogLoading(true);
+
+        adminHttp.get('/api/admin/propel/hive', {
+            params: {
+                os: catalogOs,
+                page: catalogPage,
+                query: catalogQuery || undefined,
+            },
+        })
+            .then(({ data }) => {
+                if (!active) {
+                    return;
+                }
+
+                const nextData = data?.data ?? {};
+                setCatalogItems(nextData.eggs || []);
+                setCatalogMeta({
+                    current_page: nextData.current_page || 1,
+                    total_pages: nextData.total_pages || 1,
+                    total: nextData.total || 0,
+                });
+            })
+            .catch((loadError) => {
+                if (active) {
+                    setError(toHuman(loadError));
+                }
+            })
+            .finally(() => {
+                if (active) {
+                    setCatalogLoading(false);
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [route.view, formState.nest_id, catalogOs, catalogPage, catalogQuery]);
+
     return (
         <div className="admin-page-stack">
             {error ? <Banner tone="danger">{error}</Banner> : null}
             {message ? <Banner tone="warning">{message}</Banner> : null}
-            {loading ? <PanelLoading ariaLabel={'Loading egg details'} embedded /> : null}
+            {loading ? <PanelLoading ariaLabel={'Loading shell details'} embedded /> : null}
             {!loading && route.view === 'new' ? (
                 <form className="admin-form-stack" onSubmit={async (event) => {
                     event.preventDefault();
@@ -76,16 +129,100 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                     setMessage(null);
                     try {
                         await adminHttp.get('/sanctum/csrf-cookie');
+                        const selectedNestId = formState.nest_id;
                         await adminHttp.post('/api/admin/eggs', buildEggPayload(formState));
-                        setMessage('Egg created successfully.');
-                        setFormState(buildInitialFieldState(eggFields, { force_outgoing_ip: false }));
+                        setMessage('Shell created successfully.');
+                        setFormState(buildInitialFieldState(eggFields, { force_outgoing_ip: false, nest_id: selectedNestId }));
                     } catch (saveError) {
                         setError(toHuman(saveError));
                     } finally {
                         setSubmitting(false);
                     }
                 }}>
-                    <Panel title="Create Egg" copy="Build a new egg from the legacy admin fields, now stored through the API.">
+                    <Panel title="Import Shells" copy="Choose a core, pick Linux or Windows, then import shells directly from the Propel catalog.">
+                        <div className="admin-form-grid admin-form-grid--stacked">
+                            <label className="admin-field">
+                                <span>Core</span>
+                                <select value={formState.nest_id ?? ''} onChange={(event) => {
+                                    const value = event.currentTarget.value;
+                                    setFormState((current) => ({ ...current, nest_id: value }));
+                                    setCatalogPage(1);
+                                    setSelectedCatalogItems([]);
+                                }}>
+                                    <option value="">Select a core</option>
+                                    {(refs.nests || []).map((nest: Record<string, any>) => (
+                                        <option key={nest.id} value={String(nest.id)}>
+                                            {`#${nest.id} - ${nest.name}`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="admin-field admin-field--compact">
+                                <span>Operating System</span>
+                                <select value={catalogOs} onChange={(event) => {
+                                    setCatalogOs(event.currentTarget.value === 'windows' ? 'windows' : 'linux');
+                                    setCatalogPage(1);
+                                    setSelectedCatalogItems([]);
+                                }}>
+                                    <option value="linux">Linux</option>
+                                    <option value="windows">Windows</option>
+                                </select>
+                            </label>
+                            <label className="admin-field">
+                                <span>Catalog Search</span>
+                                <input value={catalogQuery} onChange={(event) => {
+                                    setCatalogQuery(event.currentTarget.value);
+                                    setCatalogPage(1);
+                                }} placeholder="Search Minecraft, Purpur, Paper, Bungeecord..." />
+                            </label>
+                        </div>
+                        <SimpleTable
+                            title="Propel Shell Catalog"
+                            columns={['Pick', 'Shell', 'Identifier', 'Description']}
+                            rows={catalogItems.map((egg) => [
+                                <input
+                                    key={`select-${egg.identifier}`}
+                                    type="checkbox"
+                                    checked={selectedCatalogItems.includes(egg.identifier)}
+                                    onChange={(event) => setSelectedCatalogItems((current) => (
+                                        event.currentTarget.checked
+                                            ? [...current, egg.identifier]
+                                            : current.filter((identifier) => identifier !== egg.identifier)
+                                    ))}
+                                />,
+                                egg.display_name || egg.name,
+                                egg.identifier,
+                                egg.description || '-',
+                            ])}
+                            emptyLabel={formState.nest_id ? (catalogLoading ? 'Loading shells...' : 'No shells matched the current filter.') : 'Select a core to load the Propel shell catalog.'}
+                        />
+                        <div className="admin-actions-row">
+                            <button type="button" className="admin-button" disabled={catalogPage <= 1 || catalogLoading} onClick={() => setCatalogPage((current) => Math.max(1, current - 1))}><Glyph icon={LuChevronLeft} />Previous Page</button>
+                            <button type="button" className="admin-button" disabled={catalogPage >= catalogMeta.total_pages || catalogLoading} onClick={() => setCatalogPage((current) => current + 1)}>Next Page<Glyph icon={LuChevronRight} /></button>
+                            <button type="button" className="admin-button admin-button--primary" disabled={submitting || !formState.nest_id || selectedCatalogItems.length === 0} onClick={async () => {
+                                setSubmitting(true);
+                                setError(null);
+                                setMessage(null);
+                                try {
+                                    await adminHttp.get('/sanctum/csrf-cookie');
+                                    const response = await adminHttp.post('/api/admin/propel/import', {
+                                        nest_id: Number(formState.nest_id),
+                                        os: catalogOs,
+                                        identifiers: selectedCatalogItems,
+                                    });
+                                    const imported = response?.data?.data?.imported || [];
+                                    setSelectedCatalogItems([]);
+                                    setMessage(`${imported.length} shell${imported.length === 1 ? '' : 's'} imported successfully.`);
+                                    await refresh();
+                                } catch (importError) {
+                                    setError(toHuman(importError));
+                                } finally {
+                                    setSubmitting(false);
+                                }
+                            }}><Glyph icon={LuDownload} />{submitting ? 'Importing...' : 'Import Selected Shells'}</button>
+                        </div>
+                    </Panel>
+                    <Panel title="Create Shell" copy="Build a shell manually when you are not importing from the Propel catalog.">
                         <div className="admin-form-grid admin-form-grid--stacked">
                             {eggFields.map((field) => (
                                 <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => setFormState((current) => ({ ...current, [field.key]: value }))} refs={refs} />
@@ -93,7 +230,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                         </div>
                     </Panel>
                     <div className="admin-actions-row">
-                        <button type="submit" className="admin-button admin-button--primary" disabled={submitting}><Glyph icon={LuSave} />{submitting ? 'Creating...' : 'Create Egg'}</button>
+                        <button type="submit" className="admin-button admin-button--primary" disabled={submitting}><Glyph icon={LuSave} />{submitting ? 'Creating...' : 'Create Shell'}</button>
                     </div>
                 </form>
             ) : null}
@@ -101,10 +238,10 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                 <>
                     <SubnavTabs baseHref={`/admin/nests/egg/${route.id}`} items={eggDetailTabs} activeId={route.tab} />
                     <DetailList
-                        title="Egg Summary"
+                        title="Shell Summary"
                         items={[
                             ['ID', String(item.id ?? '-')],
-                            ['Nest', formatScalar(item.nest?.name ?? item.nest_id)],
+                            ['Core', formatScalar(item.nest?.name ?? item.nest_id)],
                             ['Author', formatScalar(item.author)],
                             ['Servers', String((item.servers || []).length)],
                             ['Variables', String((item.variables || []).length)],
@@ -130,7 +267,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                     setSubmitting(false);
                                 }
                             }}>
-                                <Panel title="Create Variable" copy="Add a new environment variable to this egg.">
+                                <Panel title="Create Variable" copy="Add a new environment variable to this shell.">
                                     <div className="admin-form-grid admin-form-grid--stacked">
                                         {eggVariableFields.map((field) => (
                                             <FieldEditor key={field.key} field={field} value={variableState[field.key] ?? ''} onChange={(value) => setVariableState((current) => ({ ...current, [field.key]: value }))} refs={refs} />
@@ -210,7 +347,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                             try {
                                 await adminHttp.get('/sanctum/csrf-cookie');
                                 await adminHttp.patch(`/api/admin/eggs/${item.id}/scripts`, buildEggScriptPayload(scriptState));
-                                setMessage('Egg script updated successfully.');
+                                setMessage('Shell script updated successfully.');
                                 await refresh();
                             } catch (saveError) {
                                 setError(toHuman(saveError));
@@ -218,7 +355,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                 setSubmitting(false);
                             }
                         }}>
-                            <Panel title="Install Script" copy="Matches the old script editor workflow for this egg.">
+                            <Panel title="Install Script" copy="Matches the old install script editor workflow for this shell.">
                                 <div className="admin-form-grid admin-form-grid--stacked">
                                     {eggScriptFields.map((field) => (
                                         <FieldEditor key={field.key} field={field} value={scriptState[field.key] ?? ''} onChange={(value) => setScriptState((current) => ({ ...current, [field.key]: value }))} refs={refs} />
@@ -229,13 +366,13 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                 title="Copy From Options"
                                 columns={['ID', 'Name']}
                                 rows={(item.copy_script_options || []).map((egg: Record<string, any>) => [egg.id, egg.name])}
-                                emptyLabel="No copy-from options exist for this egg."
+                                emptyLabel="No copy-from options exist for this shell."
                             />
                             <SimpleTable
-                                title="Dependent Eggs"
+                                title="Dependent Shells"
                                 columns={['ID', 'Name']}
                                 rows={(item.script_dependents || []).map((egg: Record<string, any>) => [egg.id, egg.name])}
-                                emptyLabel="No eggs currently depend on this script."
+                                emptyLabel="No shells currently depend on this script."
                             />
                             <div className="admin-actions-row">
                                 <button type="submit" className="admin-button admin-button--primary" disabled={submitting}><Glyph icon={LuSave} />Save Script</button>
@@ -251,7 +388,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                             try {
                                 await adminHttp.get('/sanctum/csrf-cookie');
                                 await adminHttp.patch(`/api/admin/eggs/${item.id}`, buildEggPayload(formState));
-                                setMessage('Egg updated successfully.');
+                                setMessage('Shell updated successfully.');
                                 await refresh();
                             } catch (saveError) {
                                 setError(toHuman(saveError));
@@ -259,7 +396,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                 setSubmitting(false);
                             }
                         }}>
-                            <Panel title="Egg Details" copy="Edit the egg fields that were previously managed through Blade.">
+                            <Panel title="Shell Details" copy="Edit the shell fields that were previously managed through the admin API.">
                                 <div className="admin-form-grid admin-form-grid--stacked">
                                     {eggFields.map((field) => (
                                         <FieldEditor key={field.key} field={field} value={formState[field.key] ?? ''} onChange={(value) => setFormState((current) => ({ ...current, [field.key]: value }))} refs={refs} />
@@ -267,9 +404,9 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                 </div>
                             </Panel>
                             <div className="admin-actions-row">
-                                <button type="submit" className="admin-button admin-button--primary" disabled={submitting}><Glyph icon={LuSave} />Save Egg</button>
+                                <button type="submit" className="admin-button admin-button--primary" disabled={submitting}><Glyph icon={LuSave} />Save Shell</button>
                                 <button type="button" className="admin-button admin-button--danger" onClick={async () => {
-                                    if (!window.confirm('Delete this egg?')) {
+                                    if (!window.confirm('Delete this shell?')) {
                                         return;
                                     }
                                     try {
@@ -279,7 +416,7 @@ export default function EggManagementPage({ route }: { route: AdminRoute }) {
                                     } catch (deleteError) {
                                         setError(toHuman(deleteError));
                                     }
-                                }}><Glyph icon={LuTrash2} />Delete Egg</button>
+                                }}><Glyph icon={LuTrash2} />Delete Shell</button>
                             </div>
                         </form>
                     ) : null}
